@@ -177,7 +177,7 @@ public class BrokenCityPieces : MonoBehaviour
                 directionAwayFromCenter.y = 0f;
             }
 
-            // Normalize means make the direction length equal to 1
+            // Normalize = make the direction length equal to 1
             crackDirections[i] = directionAwayFromCenter.normalized;
 
             // Takes the original position and pushes it away from the center

@@ -23,6 +23,13 @@ public class PlacementDraggableItem :
     // This is the plane the object moves along while being dragged
     public Transform PlaneQuadTransform;
 
+    [Header("Depth / Rotation Lock")]
+    public float frontOffset = -0.15f;
+    public bool lockRotation = true;
+
+    private float lockedWorldZ;
+    private Quaternion lockedWorldRotation;
+
 
     [Header("Auto Snap")]
 
@@ -64,6 +71,9 @@ public class PlacementDraggableItem :
         startLocalPosition = transform.localPosition;
 
         startLocalRotation = transform.localRotation;
+
+        lockedWorldZ = transform.position.z + frontOffset;
+        lockedWorldRotation = transform.rotation;
 
         Rigidbody rb = GetComponent<Rigidbody>();
 
@@ -125,7 +135,7 @@ public class PlacementDraggableItem :
         Pose pose = pointerEventData.Pointer.EndPointWorldPose;
 
         // Calculate the offset between the stylus grab point and the object
-        // Object keep the same grabbed spot while moving,
+        // Object keep the same grabbed spot while moving
         initialGrabOffset =
             Quaternion.Inverse(transform.rotation) *
             (transform.position - pose.position);
@@ -138,11 +148,10 @@ public class PlacementDraggableItem :
             // Remember the Rigidbody's original kinematic setting
             originalIsKinematic = rb.isKinematic;
 
-            // Force it to be kinematic while dragging,
-            // so physics does not fight against the stylus movement
+            // Force it to be kinematic while dragging
             rb.isKinematic = true;
 
-            // Keep gravity off.
+            // Keep gravity off
             rb.useGravity = false;
         }
 
@@ -152,7 +161,7 @@ public class PlacementDraggableItem :
 
     public void OnDrag(PointerEventData eventData)
     {
-        // This runs every frame while the item is being dragged
+        // Runs every frame while the item is being dragged
 
         if (isLocked || isMoving)
         {
@@ -171,10 +180,20 @@ public class PlacementDraggableItem :
         // Get the current stylus endpoint pose
         Pose pose = pointerEventData.Pointer.EndPointWorldPose;
 
-        // Move the object to the stylus position while keeping the original grab offset
-        transform.position =
+        Vector3 newPosition =
             pose.position +
-            (transform.rotation * initialGrabOffset);
+            (lockedWorldRotation * initialGrabOffset);
+
+        // Keep the object in front of the motherboard
+        newPosition.z = lockedWorldZ;
+
+        transform.position = newPosition;
+
+        // Stop the object from rotating while dragging
+        if (lockRotation)
+        {
+            transform.rotation = lockedWorldRotation;
+        }
     }
 
 
@@ -318,7 +337,8 @@ public class PlacementDraggableItem :
 
         // Get the final position and rotation from the correct target's snap point
         Vector3 endPosition = correctTarget.snapPoint.position;
-        Quaternion endRotation = correctTarget.snapPoint.rotation;
+        endPosition.z = lockedWorldZ;
+        Quaternion endRotation = lockedWorldRotation;
 
         float elapsed = 0f;
 
@@ -350,13 +370,22 @@ public class PlacementDraggableItem :
 
     private void SnapToTarget(PlacementDropTarget target)
     {
-        // This runs when the user drops the item on the correct target
+        // Runs when the user drops the item on the correct target
 
         isLocked = true;
 
-        // Instantly place the item at the target's snap point
-        transform.position = target.snapPoint.position;
-        transform.rotation = target.snapPoint.rotation;
+        Vector3 snapPosition = target.snapPoint.position;
+
+        // Keep object in front of the motherboard
+        snapPosition.z = lockedWorldZ;
+
+        transform.position = snapPosition;
+
+        // Keep original rotation instead of using the snap point rotation
+        if (lockRotation)
+        {
+            transform.rotation = lockedWorldRotation;
+        }
 
         target.TriggerSuccess();
     }

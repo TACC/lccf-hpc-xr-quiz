@@ -1,51 +1,30 @@
 using UnityEngine;
 
 // Goes on the correct drop area on the motherboard
-
-// Stores expected item ID, the snap point, show or hide the glow object
-// and tells SuperCityManager when the hardware's been placed correctly
 public class PlacementDropTarget : MonoBehaviour
 {
     [Header("Drop Settings")]
-
-    // ID of the item that belongs on the target
     public string expectedItemID;
 
-
     [Header("Snap Point")]
-
-    // Position and rotation where the item should snap
     public Transform snapPoint;
 
+    [Header("Target Glow")]
+    public Renderer targetRenderer;
 
-    [Header("Glow Object")]
+    public Material glowMaterial;
 
-    // Object that glows to show the user the correct placement spot
-    public GameObject glowObject;
-
+    public bool hideTargetAtStart = true;
 
     [Header("Manager")]
-
-    // Game manager, moves to the next phase
     public SuperCityManager superCityManager;
 
-
-    // Prevents TriggerSuccess from running more than once
     private bool alreadyTriggered = false;
 
+    private Material originalMaterial;
 
     void Start()
     {
-        // Runs once when this object first becomes active
-
-        // The glow only appears after the item is placed incorrectly
-        if (glowObject != null)
-        {
-            glowObject.SetActive(false);
-        }
-
-        // If no snap point assigned, use drop target's Transform
-
         if (snapPoint == null)
         {
             snapPoint = transform;
@@ -55,46 +34,68 @@ public class PlacementDropTarget : MonoBehaviour
         {
             superCityManager = FindObjectOfType<SuperCityManager>();
         }
-    }
 
+        if (targetRenderer == null)
+        {
+            targetRenderer = GetComponent<Renderer>();
+        }
+
+        if (targetRenderer != null)
+        {
+            originalMaterial = targetRenderer.material;
+
+            if (hideTargetAtStart)
+            {
+                targetRenderer.enabled = false;
+            }
+        }
+    }
 
     void OnEnable()
     {
-        // Runs every time this object becomes active
-
         alreadyTriggered = false;
 
-        if (glowObject != null)
+        if (targetRenderer == null)
         {
-            glowObject.SetActive(false);
+            targetRenderer = GetComponent<Renderer>();
+        }
+
+        if (targetRenderer != null && hideTargetAtStart)
+        {
+            targetRenderer.enabled = false;
         }
     }
-
 
     public void ShowGlow()
     {
-        // Turns on the glow object after item placed in wrong spot
-        if (glowObject != null)
+        // Makes the snap target visible after the first wrong guess
+        if (targetRenderer != null)
         {
-            glowObject.SetActive(true);
+            targetRenderer.enabled = true;
+
+            if (glowMaterial != null)
+            {
+                targetRenderer.material = glowMaterial;
+            }
         }
     }
-
 
     public void HideGlow()
     {
-        // For when the item is placed correctly
-        if (glowObject != null)
+        // Hides the snap target again once placed correctly
+        if (targetRenderer != null)
         {
-            glowObject.SetActive(false);
+            if (originalMaterial != null)
+            {
+                targetRenderer.material = originalMaterial;
+            }
+
+            targetRenderer.enabled = false;
         }
     }
 
-
     public void TriggerSuccess()
     {
-        // Runs when the correct item gets placed here
-
         if (alreadyTriggered)
         {
             return;
@@ -113,12 +114,10 @@ public class PlacementDropTarget : MonoBehaviour
 
         if (superCityManager != null)
         {
-            // Move on to next phase
             superCityManager.OnHardwarePlaced();
         }
         else
         {
-            // No supercity manager found - used to debug
             Debug.LogWarning("SuperCityManager could not be found for " + gameObject.name);
         }
     }

@@ -12,6 +12,9 @@ public class ZDropTarget : MonoBehaviour
 
     public string expectedItemID;
 
+    [Header("Scene Type")]
+
+    public bool isAnalogyDropTarget = false;
 
     [Header("Feedback Colors")]
 
@@ -103,6 +106,16 @@ public class ZDropTarget : MonoBehaviour
         Debug.Log("Incorrect drop triggered on " + gameObject.name);
 
         SetColor(incorrectColor);
+
+        if (isAnalogyDropTarget)
+        {
+            SuperCityManager manager = FindObjectOfType<SuperCityManager>();
+
+            if (manager != null)
+            {
+                manager.OnAnalogyWrongGuess();
+            }
+        }
 
         // Run anything assigned to onIncorrectDrop in the Inspector
         onIncorrectDrop.Invoke();

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 // SuperCityManager controls changing between scenes
 
@@ -19,6 +20,9 @@ public class SuperCityManager : MonoBehaviour
 
     public float introDuration = 15f;
 
+    [Header("Intro Burst")]
+    public IntroOrbBurst introOrbBurst;
+
 
     [Header("City Layer")]
 
@@ -28,8 +32,35 @@ public class SuperCityManager : MonoBehaviour
     // Array stores each city analogy phase
     public GameObject[] cityAnalogies;
 
+    [Header("Book Orbit")]
+    public BookOrbitGroup[] bookOrbitGroups;
+    public float bookReturnDuration = 1.2f;
 
     [Header("Broken City Effect")]
+
+    [Header("Final Celebration")]
+
+    public int finalPlacementPhaseIndex = 5;
+
+    public GameObject[] finalAnalogyObjects;
+
+    public Transform finalOrbitCenter;
+
+    public TMP_Text finalScoreText;
+
+    public AudioClip finalAudioClip;
+
+    public float finalObjectAppearDelay = 0.5f;
+
+    public float finalOrbitRadius = 2.5f;
+
+    public float finalOrbitHeight = 0.5f;
+
+    public float finalOrbitSpeed = 45f;
+
+    public float finalGlowIntensity = 1.5f;
+
+    public Color finalGlowColor = Color.green;
 
     // Connects to BrokenCityPieces script
     public BrokenCityPieces brokenCityPieces;
@@ -84,11 +115,13 @@ public class SuperCityManager : MonoBehaviour
 
     [Header("Audio")]
 
-    // AudioSource that plays the explanation clips
     public AudioSource explanationAudioSource;
 
-    // Stores audio clip per phase
+    // Audio clips for city analogy explanations
     public AudioClip[] explanationClips;
+
+    // Audio clips for placement layer explanations
+    public AudioClip[] placementExplanationClips;
 
 
     [Header("Timing")]
@@ -115,10 +148,34 @@ public class SuperCityManager : MonoBehaviour
     public float placementSlideUpDuration = 1.2f;
 
 
-    // Ensurese phase transition only runs once
     private bool phaseTransitionRunning = false;
 
+    private int analogyCorrectFirstTryScore = 0;
+    private bool currentAnalogyHadWrongGuess = false;
+
+    private bool analogyAudioFinished = false;
+    private bool analogySolvedWhileAudioPlaying = false;
+
+    private bool finalOrbitRunning = false;
+    private float finalOrbitAngle = 0f;
+
+    // Used so scene cannot move on until placement audio is finished
+    private bool placementAudioFinished = false;
+    private bool hardwarePlacementCompleted = false;
+
     private Vector3[] originalCityAnalogyPositions;
+
+    private Vector3[] finalOriginalOffsets;
+    private Vector3[] finalOriginalPositions;
+
+    private bool analogyCorrectVisualsStarted = false;
+    private bool analogyScoreCountedThisPhase = false;
+    private bool brokenCityRepairStarted = false;
+
+    private Quaternion[] finalOriginalRotations;
+
+    private bool analogyVisualsFinished = false;
+    private bool analogySolved = false;
 
     // Runs once when the scene begins
     void Start()
@@ -139,10 +196,35 @@ public class SuperCityManager : MonoBehaviour
         // Hide everything at the very beginning
         HideAll();
 
+        StoreFinalOriginalPositions();
+
         // Start the intro - glowing orb
         StartCoroutine(PlayIntroThenStartSceneOne());
     }
 
+    private void StoreFinalOriginalPositions()
+    {
+        if (finalAnalogyObjects == null || finalOrbitCenter == null)
+        {
+            return;
+        }
+
+        finalOriginalPositions = new Vector3[finalAnalogyObjects.Length];
+        finalOriginalOffsets = new Vector3[finalAnalogyObjects.Length];
+        finalOriginalRotations = new Quaternion[finalAnalogyObjects.Length];
+
+        for (int i = 0; i < finalAnalogyObjects.Length; i++)
+        {
+            if (finalAnalogyObjects[i] == null)
+            {
+                continue;
+            }
+
+            finalOriginalPositions[i] = finalAnalogyObjects[i].transform.position;
+            finalOriginalOffsets[i] = finalAnalogyObjects[i].transform.position - finalOrbitCenter.position;
+            finalOriginalRotations[i] = finalAnalogyObjects[i].transform.rotation;
+        }
+    }
 
     // Hides every major layer and phase object
     private void HideAll()
@@ -175,6 +257,8 @@ public class SuperCityManager : MonoBehaviour
         HideAllCityAnalogies();
 
         HideAllPlacementGroups();
+
+        HideFinalCelebrationObjects();
     }
 
 
@@ -183,37 +267,171 @@ public class SuperCityManager : MonoBehaviour
     {
         Debug.Log("Intro started.");
 
-        // Turn on the intro layer
         if (introLayer != null)
         {
             introLayer.SetActive(true);
         }
 
-        // How long the intro stays visible
-        yield return new WaitForSeconds(introDuration);
-
-        // Hide the intro afterwards
-        if (introLayer != null)
+        if (cityLayer != null)
         {
-            introLayer.SetActive(false);
+            cityLayer.SetActive(false);
         }
 
-        // Show the city layer to start the first analogy
+        yield return new WaitForSeconds(introDuration);
+
+        int phaseIndex = 0;
+
+        if (cityAnalogies == null || phaseIndex < 0 || phaseIndex >= cityAnalogies.Length)
+        {
+            Debug.LogWarning("Invalid first city analogy phase.");
+            yield break;
+        }
+
+        currentPhase = phaseIndex;
+        phaseTransitionRunning = false;
+
         if (cityLayer != null)
         {
             cityLayer.SetActive(true);
         }
 
-        Debug.Log("Intro finished. Starting first analogy.");
-        
-        StartAnalogyPhase(0);
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        HideAllCityAnalogies();
+        HideAllPlacementGroups();
+
+        if (repairedCityModel != null)
+        {
+            repairedCityModel.SetActive(false);
+        }
+
+        if (brokenPlaneObject != null)
+        {
+            brokenPlaneObject.SetActive(IsBrokenCityPhase());
+        }
+
+        GameObject firstAnalogy = cityAnalogies[currentPhase];
+
+        if (firstAnalogy == null)
+        {
+            yield break;
+        }
+
+        firstAnalogy.transform.position = originalCityAnalogyPositions[currentPhase];
+
+        foreach (Transform child in firstAnalogy.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+
+        // The first analogy stays hidden until the glow reaches peak brightness
+        firstAnalogy.SetActive(false);
+
+        if (introOrbBurst != null)
+        {
+            yield return StartCoroutine(introOrbBurst.PlayBurstThenReveal(firstAnalogy));
+        }
+        else
+        {
+            firstAnalogy.SetActive(true);
+        }
+
+        if (introLayer != null)
+        {
+            introLayer.SetActive(false);
+        }
+
+        if (bookOrbitGroups != null &&
+            currentPhase >= 0 &&
+            currentPhase < bookOrbitGroups.Length &&
+            bookOrbitGroups[currentPhase] != null)
+        {
+            bookOrbitGroups[currentPhase].RefreshBookOrbits();
+            bookOrbitGroups[currentPhase].SaveCurrentBookPositionsAsHome();
+            bookOrbitGroups[currentPhase].StartAllBookOrbits();
+        }
+
+        currentAnalogyHadWrongGuess = false;
+        analogyScoreCountedThisPhase = false;
+        analogyCorrectVisualsStarted = false;
+        brokenCityRepairStarted = false;
+        analogyVisualsFinished = false;
+        analogySolved = false;
+
+        StartCoroutine(PlayAnalogyAudioForCurrentPhase());
+
+        Debug.Log("Intro finished. First analogy revealed.");
     }
 
+    private void PrepareFirstAnalogyInMiddle()
+    {
+        int phaseIndex = 0;
+
+        if (cityAnalogies == null || phaseIndex < 0 || phaseIndex >= cityAnalogies.Length)
+        {
+            Debug.LogWarning("Invalid first city analogy phase.");
+            return;
+        }
+
+        currentPhase = phaseIndex;
+        phaseTransitionRunning = false;
+
+        if (cityLayer != null)
+        {
+            cityLayer.SetActive(true);
+        }
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        HideAllCityAnalogies();
+        HideAllPlacementGroups();
+
+        if (repairedCityModel != null)
+        {
+            repairedCityModel.SetActive(false);
+        }
+
+        if (brokenPlaneObject != null)
+        {
+            brokenPlaneObject.SetActive(IsBrokenCityPhase());
+        }
+
+        GameObject firstAnalogy = cityAnalogies[currentPhase];
+
+        if (firstAnalogy == null)
+        {
+            return;
+        }
+
+        // Put first analogy directly in its normal middle position
+        firstAnalogy.transform.position = originalCityAnalogyPositions[currentPhase];
+        firstAnalogy.SetActive(true);
+
+        foreach (Transform child in firstAnalogy.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+
+        if (bookOrbitGroups != null &&
+            currentPhase >= 0 &&
+            currentPhase < bookOrbitGroups.Length &&
+            bookOrbitGroups[currentPhase] != null)
+        {
+            bookOrbitGroups[currentPhase].RefreshBookOrbits();
+            bookOrbitGroups[currentPhase].SaveCurrentBookPositionsAsHome();
+            bookOrbitGroups[currentPhase].StartAllBookOrbits();
+        }
+    }
 
     // Starts a specific analogy phase
     public void StartAnalogyPhase(int phaseIndex)
     {
-        // Check if the requested phase is valid
         if (cityAnalogies == null || phaseIndex < 0 || phaseIndex >= cityAnalogies.Length)
         {
             Debug.LogWarning("Invalid city analogy phase: " + phaseIndex);
@@ -222,30 +440,24 @@ public class SuperCityManager : MonoBehaviour
 
         currentPhase = phaseIndex;
 
-        // Reset this to false so this new phase can transition later
         phaseTransitionRunning = false;
 
-        // Make the city layer visible
         if (cityLayer != null)
         {
             cityLayer.SetActive(true);
         }
 
-        // Hide placement layer
         if (placementLayer != null)
         {
             placementLayer.SetActive(false);
         }
 
-        // Make sure the transition flash is off at the start of the phase
         if (transitionFlashObject != null)
         {
             transitionFlashObject.SetActive(false);
         }
 
-        // Prevents two analogy scenes from being visible at the same time
         HideAllCityAnalogies();
-
         HideAllPlacementGroups();
 
         if (repairedCityModel != null)
@@ -253,7 +465,6 @@ public class SuperCityManager : MonoBehaviour
             repairedCityModel.SetActive(false);
         }
 
-        // If this is the broken city phase, show the broken city object
         if (brokenPlaneObject != null)
         {
             brokenPlaneObject.SetActive(IsBrokenCityPhase());
@@ -263,18 +474,26 @@ public class SuperCityManager : MonoBehaviour
 
         if (currentAnalogy != null)
         {
-            // Reset the analogy back to its original position
             currentAnalogy.transform.position = originalCityAnalogyPositions[currentPhase];
 
             currentAnalogy.SetActive(true);
 
-            // Turn on all children under analogy
             foreach (Transform child in currentAnalogy.transform)
             {
                 child.gameObject.SetActive(true);
             }
+
+            if (bookOrbitGroups != null &&
+                currentPhase >= 0 &&
+                currentPhase < bookOrbitGroups.Length &&
+                bookOrbitGroups[currentPhase] != null)
+            {
+                bookOrbitGroups[currentPhase].RefreshBookOrbits();
+                bookOrbitGroups[currentPhase].SaveCurrentBookPositionsAsHome();
+                bookOrbitGroups[currentPhase].StartAllBookOrbits();
+            }
         }
-        
+
         Debug.Log("Starting analogy phase " + currentPhase);
     }
 
@@ -337,86 +556,194 @@ public class SuperCityManager : MonoBehaviour
             return;
         }
 
+        if (!analogyScoreCountedThisPhase)
+        {
+            if (!currentAnalogyHadWrongGuess)
+            {
+                analogyCorrectFirstTryScore++;
+                Debug.Log("First try correct! Score: " + analogyCorrectFirstTryScore);
+            }
+            else
+            {
+                Debug.Log("Correct, but not on first try. Score stays: " + analogyCorrectFirstTryScore);
+            }
+
+            analogyScoreCountedThisPhase = true;
+        }
+
+        analogySolved = true;
+        StartCoroutine(StartCorrectAnalogyVisualsImmediately());
+
+        TryStartAnalogyTransition();
+    }
+
+    private void TryStartAnalogyTransition()
+    {
+        if (!analogySolved)
+        {
+            return;
+        }
+
+        if (!analogyAudioFinished)
+        {
+            Debug.Log("Waiting for analogy audio to finish.");
+            return;
+        }
+
+        if (!analogyVisualsFinished)
+        {
+            Debug.Log("Waiting for analogy visuals to finish.");
+            return;
+        }
+
+        if (phaseTransitionRunning)
+        {
+            return;
+        }
+
         StartCoroutine(AnalogySolvedRoutine());
+    }
+
+    private IEnumerator StartCorrectAnalogyVisualsImmediately()
+    {
+        if (analogyCorrectVisualsStarted)
+        {
+            yield break;
+        }
+
+        analogyCorrectVisualsStarted = true;
+        analogyVisualsFinished = false;
+
+        // Bookshelf animation
+        if (bookOrbitGroups != null &&
+            currentPhase >= 0 &&
+            currentPhase < bookOrbitGroups.Length &&
+            bookOrbitGroups[currentPhase] != null)
+        {
+            bookOrbitGroups[currentPhase].StopAllBookOrbits();
+
+            yield return StartCoroutine(
+                bookOrbitGroups[currentPhase].SlideAllBooksBack(bookReturnDuration)
+            );
+        }
+
+        // Broken city animation
+        if (IsBrokenCityPhase())
+        {
+            HideCurrentPhaseAnswerChoices();
+
+            if (brokenCityPieces != null)
+            {
+                Debug.Log("Starting broken city repair immediately.");
+
+                brokenCityPieces.RepairCity();
+                brokenCityRepairStarted = true;
+
+                yield return new WaitForSeconds(brokenCityPieces.repairDuration);
+
+                if (repairedCityModel != null)
+                {
+                    repairedCityModel.SetActive(true);
+                }
+
+                if (brokenPlaneObject != null)
+                {
+                    brokenPlaneObject.SetActive(false);
+                }
+
+                if (holdAfterRepairDuration > 0f)
+                {
+                    yield return new WaitForSeconds(holdAfterRepairDuration);
+                }
+            }
+        }
+
+        analogyVisualsFinished = true;
+
+        Debug.Log("Analogy visuals finished.");
+
+        TryStartAnalogyTransition();
+    }
+
+    public void OnAnalogyWrongGuess()
+    {
+        currentAnalogyHadWrongGuess = true;
+        Debug.Log("Wrong analogy guess. This phase no longer counts as first try.");
     }
 
 
     // Controls what happens after the user solves an analogy
     //
-    // Marks transition as running, repairs the city (if applicable), plays
-    // explanation audio, slides analogy away, play transition flash, starts
-    // placement layer
+    // Marks transition as running,
+    // slides analogy away, starts placement layer
     private IEnumerator AnalogySolvedRoutine()
     {
         phaseTransitionRunning = true;
 
-        Debug.Log("Correct analogy selected. Starting transition.");
-
-        // Check if the current phase uses the broken city effect
-        bool useBrokenCityEffect = IsBrokenCityPhase();
-
-        if (useBrokenCityEffect)
-        {
-            // Hide the orbiting answer choices
-            HideCurrentPhaseAnswerChoices();
-
-            Debug.Log("Starting broken city repair.");
-
-            // Call BrokenCityPieces script to begin repairing the city
-            brokenCityPieces.RepairCity();
-        }
+        Debug.Log("Audio and visuals finished. Starting scene transition.");
 
         yield return new WaitForSeconds(pauseBeforeAudio);
 
-        // Check for a valid audio source and audio clip
+        yield return new WaitForSeconds(pauseAfterAudio);
+
+        yield return StartCoroutine(SlideCurrentAnalogyUp());
+
+        yield return StartCoroutine(PlayTransitionFlash());
+
+        yield return StartCoroutine(StartPlacementLayer());
+
+        phaseTransitionRunning = false;
+    }
+
+    private IEnumerator PlayPlacementAudioForCurrentPhase()
+    {
+        placementAudioFinished = false;
+
+        if (explanationAudioSource != null &&
+            placementExplanationClips != null &&
+            currentPhase >= 0 &&
+            currentPhase < placementExplanationClips.Length &&
+            placementExplanationClips[currentPhase] != null)
+        {
+            explanationAudioSource.clip = placementExplanationClips[currentPhase];
+            explanationAudioSource.Play();
+
+            yield return new WaitForSeconds(placementExplanationClips[currentPhase].length);
+        }
+
+        placementAudioFinished = true;
+
+        // If the user already placed the hardware while the audio was playing,
+        // continue now that the audio is finished.
+        if (hardwarePlacementCompleted)
+        {
+            StartCoroutine(HardwarePlacedRoutine());
+        }
+    }
+
+    private IEnumerator PlayAnalogyAudioForCurrentPhase()
+    {
+        analogyAudioFinished = false;
+        analogySolvedWhileAudioPlaying = false;
+
         if (explanationAudioSource != null &&
             explanationClips != null &&
             currentPhase >= 0 &&
             currentPhase < explanationClips.Length &&
             explanationClips[currentPhase] != null)
         {
-            // Put the correct phase audio clip into the AudioSource
+            explanationAudioSource.Stop();
             explanationAudioSource.clip = explanationClips[currentPhase];
-
-            // Play the audio
             explanationAudioSource.Play();
+
+            Debug.Log("Playing analogy audio for phase " + currentPhase);
 
             yield return new WaitForSeconds(explanationClips[currentPhase].length);
         }
 
-        if (useBrokenCityEffect && waitForCityRepairBeforePlacement)
-        {
-            yield return new WaitForSeconds(brokenCityPieces.repairDuration);
+        analogyAudioFinished = true;
 
-            // Show the clean repaired city model
-            if (repairedCityModel != null)
-            {
-                repairedCityModel.SetActive(true);
-            }
-
-            // Hide the broken city
-            if (brokenPlaneObject != null)
-            {
-                brokenPlaneObject.SetActive(false);
-            }
-
-            if (holdAfterRepairDuration > 0f)
-            {
-                Debug.Log("Holding repaired city for " + holdAfterRepairDuration + " seconds.");
-                yield return new WaitForSeconds(holdAfterRepairDuration);
-            }
-        }
-
-        yield return new WaitForSeconds(pauseAfterAudio);
-
-        // Slide the current analogy upward and then hide it
-        yield return StartCoroutine(SlideCurrentAnalogyUp());
-
-        // Play the flash transition
-        yield return StartCoroutine(PlayTransitionFlash());
-
-        // Start the placement layer for this phase
-        yield return StartCoroutine(StartPlacementLayer());
+        TryStartAnalogyTransition();
     }
 
     // Slides the current analogy upward when it is done
@@ -472,7 +799,7 @@ public class SuperCityManager : MonoBehaviour
     // This turns on the transition flash for a short amount of time
     private IEnumerator PlayTransitionFlash()
     {
-        // Skip id no flash object is assigned
+        // Skip if no flash object is assigned
         if (transitionFlashObject == null)
         {
             yield break;
@@ -489,13 +816,11 @@ public class SuperCityManager : MonoBehaviour
     // Starts the placement layer for the current phase
     private IEnumerator StartPlacementLayer()
     {
-        // Turn on the main placement layer
         if (placementLayer != null)
         {
             placementLayer.SetActive(true);
         }
 
-        // Hide all placement groups first so only the correct one appears
         HideAllPlacementGroups();
 
         GameObject currentPlacementGroup = null;
@@ -515,17 +840,11 @@ public class SuperCityManager : MonoBehaviour
         }
 
         Vector3 finalPosition = currentPlacementGroup.transform.position;
-
-        // Start the placement group below its final position to slide into view
         Vector3 startPosition = finalPosition + new Vector3(0f, -placementSlideUpDistance, 0f);
 
-        // Move the placement group to the start position
         currentPlacementGroup.transform.position = startPosition;
-
-        // Turn on the placement group
         currentPlacementGroup.SetActive(true);
 
-        // Slide the placement group upward into its final position
         yield return StartCoroutine(SlideObject(
             currentPlacementGroup,
             startPosition,
@@ -534,6 +853,17 @@ public class SuperCityManager : MonoBehaviour
         ));
 
         Debug.Log("Showing placement group for phase " + currentPhase);
+
+        // Reset placement completion state for this phase
+        placementAudioFinished = false;
+        hardwarePlacementCompleted = false;
+
+        // The city-to-placement transition is done now
+        // Allow hardware placement to be detected
+        phaseTransitionRunning = false;
+
+        // Start placement audio
+        StartCoroutine(PlayPlacementAudioForCurrentPhase());
 
         if (IsMotherboardOnlyPlacementPhase())
         {
@@ -546,19 +876,11 @@ public class SuperCityManager : MonoBehaviour
         else
         {
             Debug.Log("Waiting for user to correctly place the hardware.");
-
-            // The PlacementDropTarget script will call OnHardwarePlaced() 
-            // after the hardware item is placed in the correct spot
         }
     }
 
 
     // Slides any GameObject from one position to another
-    //
-    // obj = the object to move
-    // startPosition = where the object begins
-    // endPosition = where the object ends
-    // duration = how long the slide takes
     private IEnumerator SlideObject(GameObject obj, Vector3 startPosition, Vector3 endPosition, float duration)
     {
         float elapsedTime = 0f;
@@ -590,7 +912,7 @@ public class SuperCityManager : MonoBehaviour
 
 
     // Hides the draggable answer choices for the current city analogy
-    // Mainly used before the broken city repair effect starts
+    // Used before the broken city repair effect starts
     private void HideCurrentPhaseAnswerChoices()
     {
         if (cityAnalogies == null ||
@@ -620,7 +942,63 @@ public class SuperCityManager : MonoBehaviour
     // Called when the hardware placement is finished
     public void OnHardwarePlaced()
     {
+        if (phaseTransitionRunning)
+        {
+            return;
+        }
+
+        hardwarePlacementCompleted = true;
+
+        if (!placementAudioFinished)
+        {
+            Debug.Log("Hardware placed, but waiting for placement audio to finish.");
+            return;
+        }
+
+        StartCoroutine(HardwarePlacedRoutine());
+    }
+
+    private IEnumerator HardwarePlacedRoutine()
+    {
+        if (phaseTransitionRunning)
+        {
+            yield break;
+        }
+        
+        phaseTransitionRunning = true;
+
         Debug.Log("Hardware placed correctly or timer finished for phase " + currentPhase);
+
+        if (currentPhase == finalPlacementPhaseIndex)
+        {
+            yield return StartCoroutine(FinalCelebrationRoutine());
+            yield break;
+        }
+
+        GameObject currentPlacementGroup = null;
+
+        if (placementGroups != null &&
+            currentPhase >= 0 &&
+            currentPhase < placementGroups.Length)
+        {
+            currentPlacementGroup = placementGroups[currentPhase];
+        }
+
+        // Slide the placement group upward out of view
+        if (currentPlacementGroup != null && currentPlacementGroup.activeSelf)
+        {
+            Vector3 startPosition = currentPlacementGroup.transform.position;
+            Vector3 endPosition = startPosition + new Vector3(0f, placementSlideUpDistance, 0f);
+
+            yield return StartCoroutine(SlideObject(
+                currentPlacementGroup,
+                startPosition,
+                endPosition,
+                placementSlideUpDuration
+            ));
+
+            currentPlacementGroup.SetActive(false);
+        }
 
         HideAllPlacementGroups();
 
@@ -631,15 +1009,243 @@ public class SuperCityManager : MonoBehaviour
 
         currentPhase++;
 
-        // Start next city analogy phase
         if (cityAnalogies != null && currentPhase < cityAnalogies.Length)
         {
-            StartAnalogyPhase(currentPhase);
+            yield return StartCoroutine(StartAnalogyPhaseWithSlide(currentPhase));
         }
         else
         {
-            // The game is finished
             Debug.Log("All phases completed.");
+        }
+
+        phaseTransitionRunning = false;
+    }
+
+    // Starts a specific analogy phase with slide-in
+    private IEnumerator StartAnalogyPhaseWithSlide(int phaseIndex)
+    {
+        if (cityAnalogies == null || phaseIndex < 0 || phaseIndex >= cityAnalogies.Length)
+        {
+            Debug.LogWarning("Invalid city analogy phase: " + phaseIndex);
+            yield break;
+        }
+
+        currentPhase = phaseIndex;
+
+        if (cityLayer != null)
+        {
+            cityLayer.SetActive(true);
+        }
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        if (transitionFlashObject != null)
+        {
+            transitionFlashObject.SetActive(false);
+        }
+
+        HideAllCityAnalogies();
+        HideAllPlacementGroups();
+
+        if (repairedCityModel != null)
+        {
+            repairedCityModel.SetActive(false);
+        }
+
+        if (brokenPlaneObject != null)
+        {
+            brokenPlaneObject.SetActive(IsBrokenCityPhase());
+        }
+
+        GameObject currentAnalogy = cityAnalogies[currentPhase];
+
+        if (currentAnalogy == null)
+        {
+            yield break;
+        }
+
+        Vector3 finalPosition = originalCityAnalogyPositions[currentPhase];
+        Vector3 startPosition = finalPosition + new Vector3(0f, -analogySlideUpDistance, 0f);
+
+        // Put the whole analogy below the screen first
+        currentAnalogy.transform.position = startPosition;
+        currentAnalogy.SetActive(true);
+
+        foreach (Transform child in currentAnalogy.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+
+        // Books orbiting animation
+        if (bookOrbitGroups != null &&
+            currentPhase >= 0 &&
+            currentPhase < bookOrbitGroups.Length &&
+            bookOrbitGroups[currentPhase] != null)
+        {
+            bookOrbitGroups[currentPhase].RefreshBookOrbits();
+            bookOrbitGroups[currentPhase].SaveCurrentBookPositionsAsHome();
+            bookOrbitGroups[currentPhase].StartAllBookOrbits();
+        }
+
+        // Slide the whole analogy parent into place
+        yield return StartCoroutine(SlideObject(
+            currentAnalogy,
+            startPosition,
+            finalPosition,
+            analogySlideUpDuration
+        ));
+
+        currentAnalogyHadWrongGuess = false;
+        analogyScoreCountedThisPhase = false;
+        analogyCorrectVisualsStarted = false;
+        brokenCityRepairStarted = false;
+        analogyVisualsFinished = false;
+        analogySolved = false;
+
+        StartCoroutine(PlayAnalogyAudioForCurrentPhase());
+
+        Debug.Log("Starting analogy phase " + currentPhase);
+    }
+
+    private void SetObjectGreenGlow(GameObject obj)
+    {
+        Renderer[] objectRenderers = obj.GetComponentsInChildren<Renderer>(true);
+
+        foreach (Renderer renderer in objectRenderers)
+        {
+            if (renderer == null)
+            {
+                continue;
+            }
+
+            Material material = renderer.material;
+
+            if (material.HasProperty("_EmissionColor"))
+            {
+                material.EnableKeyword("_EMISSION");
+                material.SetColor("_EmissionColor", finalGlowColor * finalGlowIntensity);
+            }
+
+            if (material.HasProperty("_Color"))
+            {
+                Color currentColor = material.color;
+                material.color = Color.Lerp(currentColor, finalGlowColor, 0.25f);
+            }
+        }
+    }
+
+    void Update()
+    {
+        if (!finalOrbitRunning)
+        {
+            return;
+        }
+
+        if (finalAnalogyObjects == null || finalOrbitCenter == null || finalOriginalOffsets == null)
+        {
+            return;
+        }
+
+        finalOrbitAngle += finalOrbitSpeed * Time.deltaTime;
+
+        for (int i = 0; i < finalAnalogyObjects.Length; i++)
+        {
+            if (finalAnalogyObjects[i] == null || !finalAnalogyObjects[i].activeSelf)
+            {
+                continue;
+            }
+
+            // Rotate each object's original offset around the motherboard
+            Quaternion rotation = Quaternion.Euler(0f, finalOrbitAngle, 0f);
+
+            Vector3 rotatedOffset = rotation * finalOriginalOffsets[i];
+
+            finalAnalogyObjects[i].transform.position = finalOrbitCenter.position + rotatedOffset;
+
+            if (finalOriginalRotations != null && i < finalOriginalRotations.Length)
+            {
+                finalAnalogyObjects[i].transform.rotation = finalOriginalRotations[i];
+            }
+        }
+    }
+
+    private IEnumerator FinalCelebrationRoutine()
+    {
+        Debug.Log("Final placement complete. Starting final celebration.");
+
+        finalOrbitRunning = false;
+        finalOrbitAngle = 0f;
+
+        HideFinalCelebrationObjects();
+
+        if (explanationAudioSource != null && finalAudioClip != null)
+        {
+            explanationAudioSource.Stop();
+            explanationAudioSource.clip = finalAudioClip;
+            explanationAudioSource.Play();
+        }
+
+        if (finalAnalogyObjects != null)
+        {
+            for (int i = 0; i < finalAnalogyObjects.Length; i++)
+            {
+                GameObject obj = finalAnalogyObjects[i];
+
+                if (obj == null)
+                {
+                    continue;
+                }
+
+                // Restore original position
+                if (finalOriginalPositions != null && i < finalOriginalPositions.Length)
+                {
+                    obj.transform.position = finalOriginalPositions[i];
+                }
+
+                // Restore original rotation
+                if (finalOriginalRotations != null && i < finalOriginalRotations.Length)
+                {
+                    obj.transform.rotation = finalOriginalRotations[i];
+                }
+
+                obj.SetActive(true);
+
+                SetObjectGreenGlow(obj);
+
+                yield return new WaitForSeconds(finalObjectAppearDelay);
+            }
+        }
+
+        if (finalScoreText != null)
+        {
+            finalScoreText.text = "Analogy Score: " + analogyCorrectFirstTryScore + " / " + cityAnalogies.Length;
+            finalScoreText.gameObject.SetActive(true);
+        }
+
+        finalOrbitRunning = true;
+
+        Debug.Log("Final score displayed: " + analogyCorrectFirstTryScore);
+    }
+
+    private void HideFinalCelebrationObjects()
+    {
+        if (finalAnalogyObjects != null)
+        {
+            foreach (GameObject obj in finalAnalogyObjects)
+            {
+                if (obj != null)
+                {
+                    obj.SetActive(false);
+                }
+            }
+        }
+
+        if (finalScoreText != null)
+        {
+            finalScoreText.gameObject.SetActive(false);
         }
     }
 }

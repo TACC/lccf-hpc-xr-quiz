@@ -95,14 +95,14 @@ public class AudioRingPulse : MonoBehaviour
         // Holds the total loudness
         float total = 0f;
 
-        // for each audu=io sample in the array.
+        // for each audio sample in the array
         for (int i = 0; i < samples.Length; i++)
         {
             // absolute value to measure loudness instead of direction (wave values)
             total += Mathf.Abs(samples[i]);
         }
 
-        // return average loudness.
+        // return average loudness
         return total / samples.Length;
     }
 }

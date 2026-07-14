@@ -8,8 +8,8 @@ using zSpace.Core.Input;
 //
 // Lets the user grab and drag the object, keeps the object locked on drag 
 // plane, detects when the object is hovering over a drop target, checks if 
-// object was dropped on the correct target, triggers success/failure, and
-// turns orbiting off while dragging and back on if the answer is wrong
+// correct target, triggers success/failure, and turns orbiting off while 
+// dragging and back on if the answer is wrong
 public class ZDraggableItem :
     ZPointerInteractable, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -123,7 +123,7 @@ public class ZDraggableItem :
         {
             originalIsKinematic = rb.isKinematic;
 
-            // The script controls movement when kinematic is on, not physics 
+            // The script controls movement when kinematic is on 
             rb.isKinematic = true;
         }
 
@@ -146,14 +146,14 @@ public class ZDraggableItem :
         Pose pose = pointerEventData.Pointer.EndPointWorldPose;
 
 
-        // Move the object to follow the stylus.
+        // Move the object to follow the stylus
         transform.position =
             pose.position +
             (transform.rotation * initialGrabOffset);
     }
 
 
-    // Rruns when the user lets go of the object
+    // Runs when the user lets go of the object
     public void OnEndDrag(PointerEventData eventData)
     {
         ZPointerEventData pointerEventData = eventData as ZPointerEventData;
@@ -201,7 +201,7 @@ public class ZDraggableItem :
         }
         else
         {
-            // Object not dropped on any target soreturn to original position
+            // Object not dropped on any target, return to original position
             ResetPosition();
         }
     }

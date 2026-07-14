@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// LineRenderer iused to draw the ring shape
+// LineRenderer is used to draw the ring shape
 [RequireComponent(typeof(LineRenderer))]
 public class AudioWaveRing : MonoBehaviour
 {
@@ -58,7 +58,7 @@ public class AudioWaveRing : MonoBehaviour
         // Makes the LineRenderer connect the last point back to the first point
         lineRenderer.loop = true;
 
-        // false means the points are positioned relative to this GameObject
+        // False means the points are positioned relative to this GameObject
         lineRenderer.useWorldSpace = false;
 
         // Tell the LineRenderer how many points it needs to draw
@@ -82,10 +82,9 @@ public class AudioWaveRing : MonoBehaviour
         // Go through every point in the ring
         for (int i = 0; i < pointCount; i++)
         {
-            // percent tells us how far around the circle this point is
+            // Percent tells us how far around the circle this point is
             float percent = (float)i / pointCount;
 
-            // Convert the percent into an angle in radians
             float angle = percent * Mathf.PI * 2f;
 
             // Pick an audio sample that matches this point's position around the ring
@@ -112,7 +111,7 @@ public class AudioWaveRing : MonoBehaviour
 
             float speed;
 
-            // target offset> current offset = moving outward
+            // target offset > current offset = moving outward
             if (targetOffset > currentOffsets[i])
             {
                 speed = attackSpeed;
