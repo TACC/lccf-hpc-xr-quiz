@@ -1,0 +1,10 @@
+{
+    "name": "zSpace.Core.Editor",
+    "references": [
+        "zSpace.Core.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
