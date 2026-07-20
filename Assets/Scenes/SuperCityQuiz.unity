@@ -5397,8 +5397,8 @@ Transform:
   m_GameObject: {fileID: 9057500}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.051, y: 0.546, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2015494585}
@@ -5991,7 +5991,6 @@ GameObject:
   - component: {fileID: 108747416}
   - component: {fileID: 108747420}
   - component: {fileID: 108747419}
-  - component: {fileID: 108747418}
   - component: {fileID: 108747417}
   m_Layer: 0
   m_Name: HeatsinkChoice-m2
@@ -6009,8 +6008,8 @@ Transform:
   m_GameObject: {fileID: 108747415}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.060000002, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.164, y: -0.822, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1006659969}
@@ -6044,22 +6043,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &108747418
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 108747415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1269539818}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 180
 --- !u!65 &108747419
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7535,7 +7518,6 @@ GameObject:
   - component: {fileID: 200411397}
   - component: {fileID: 200411401}
   - component: {fileID: 200411400}
-  - component: {fileID: 200411399}
   - component: {fileID: 200411398}
   m_Layer: 0
   m_Name: HeatsinkChoice
@@ -7553,8 +7535,8 @@ Transform:
   m_GameObject: {fileID: 200411396}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.55, y: -0.060000002, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.169, y: -0.815, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 150272041}
@@ -7588,22 +7570,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &200411399
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200411396}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 977558403}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 180
 --- !u!65 &200411400
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9361,7 +9327,6 @@ GameObject:
   - component: {fileID: 389324604}
   - component: {fileID: 389324608}
   - component: {fileID: 389324607}
-  - component: {fileID: 389324606}
   - component: {fileID: 389324605}
   m_Layer: 0
   m_Name: SuperchipChoice
@@ -9379,8 +9344,8 @@ Transform:
   m_GameObject: {fileID: 389324603}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.119, y: -0.286, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -2.064, y: -1.037, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 680557832}
@@ -9414,22 +9379,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &389324606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 389324603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1835606695}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 0
 --- !u!65 &389324607
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10043,7 +9992,6 @@ GameObject:
   - component: {fileID: 458580224}
   - component: {fileID: 458580228}
   - component: {fileID: 458580227}
-  - component: {fileID: 458580226}
   - component: {fileID: 458580225}
   m_Layer: 0
   m_Name: SuperchipChoice-m2
@@ -10061,8 +10009,8 @@ Transform:
   m_GameObject: {fileID: 458580223}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.119, y: -0.286, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -2.064, y: -1.052, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 180553797}
@@ -10096,22 +10044,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &458580226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 458580223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1320570800}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 0
 --- !u!65 &458580227
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15585,7 +15517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &524084752
 Transform:
   m_ObjectHideFlags: 0
@@ -15595,7 +15527,7 @@ Transform:
   m_GameObject: {fileID: 524084751}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0.034, y: 0.721, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15632,8 +15564,8 @@ Transform:
   m_GameObject: {fileID: 533244557}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.043, y: 0.295, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 917968305}
@@ -20894,23 +20826,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 03650812debe3eb4daea2c89cad38746, type: 3}
       propertyPath: m_LocalScale.x
-      value: 15
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 03650812debe3eb4daea2c89cad38746, type: 3}
       propertyPath: m_LocalScale.y
-      value: 15
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 03650812debe3eb4daea2c89cad38746, type: 3}
       propertyPath: m_LocalScale.z
-      value: 15
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 03650812debe3eb4daea2c89cad38746, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.047
+      value: 0.039
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 03650812debe3eb4daea2c89cad38746, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.893
+      value: 1.521
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 03650812debe3eb4daea2c89cad38746, type: 3}
       propertyPath: m_LocalPosition.z
@@ -22988,7 +22920,6 @@ GameObject:
   - component: {fileID: 853431562}
   - component: {fileID: 853431566}
   - component: {fileID: 853431565}
-  - component: {fileID: 853431564}
   - component: {fileID: 853431563}
   m_Layer: 0
   m_Name: M2SSDChoice-m2
@@ -23006,8 +22937,8 @@ Transform:
   m_GameObject: {fileID: 853431561}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.199, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.747, y: -0.061, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 270722187}
@@ -23041,22 +22972,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &853431564
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 853431561}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 724647403}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 270
 --- !u!65 &853431565
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23122,7 +23037,6 @@ GameObject:
   - component: {fileID: 886097931}
   - component: {fileID: 886097935}
   - component: {fileID: 886097934}
-  - component: {fileID: 886097933}
   - component: {fileID: 886097932}
   m_Layer: 0
   m_Name: RiserCardChoice
@@ -23140,8 +23054,8 @@ Transform:
   m_GameObject: {fileID: 886097930}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.39999998, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.89, y: -1.4, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1671199898}
@@ -23175,22 +23089,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &886097933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 886097930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 587454952}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 90
 --- !u!65 &886097934
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23755,13 +23653,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 917968300}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.055, y: 1.12, z: -0.4}
-  m_LocalScale: {x: 0.648, y: 0.5, z: 1}
+  m_LocalRotation: {x: 0, y: 0.9848078, z: -0.17364816, w: 0}
+  m_LocalPosition: {x: 0.056, y: 1.149, z: -0.266}
+  m_LocalScale: {x: 0.75, y: 0.4, z: 0.74}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 533244558}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 20, y: 180, z: 0}
 --- !u!1001 &924283197
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24550,7 +24448,6 @@ GameObject:
   - component: {fileID: 971958000}
   - component: {fileID: 971958004}
   - component: {fileID: 971958003}
-  - component: {fileID: 971958002}
   - component: {fileID: 971958001}
   m_Layer: 0
   m_Name: M2SSDChoice
@@ -24568,8 +24465,8 @@ Transform:
   m_GameObject: {fileID: 971957999}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.199, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.747, y: -0.081, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1965226559}
@@ -24603,22 +24500,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &971958002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 971957999}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1968651000}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 270
 --- !u!65 &971958003
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -30235,7 +30116,6 @@ GameObject:
   - component: {fileID: 1105232579}
   - component: {fileID: 1105232583}
   - component: {fileID: 1105232582}
-  - component: {fileID: 1105232580}
   - component: {fileID: 1105232584}
   m_Layer: 0
   m_Name: InfiniBandChoice
@@ -30253,30 +30133,14 @@ Transform:
   m_GameObject: {fileID: 1105232578}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1.121, y: -0.79, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 426153923}
   - {fileID: 6289534}
   m_Father: {fileID: 1520893896}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1105232580
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1105232578}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 186307920}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 0
 --- !u!65 &1105232582
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -30945,23 +30809,23 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 822575b06dfb62846927a12d4093e0e4, type: 2}
     - target: {fileID: -8679921383154817045, guid: 2ec960c0f3c639a43a45ddea31842aaf, type: 3}
       propertyPath: m_LocalScale.x
-      value: 13
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ec960c0f3c639a43a45ddea31842aaf, type: 3}
       propertyPath: m_LocalScale.y
-      value: 17
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ec960c0f3c639a43a45ddea31842aaf, type: 3}
       propertyPath: m_LocalScale.z
-      value: 17
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ec960c0f3c639a43a45ddea31842aaf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.15
+      value: 0.056
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ec960c0f3c639a43a45ddea31842aaf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.15
+      value: 1.783
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ec960c0f3c639a43a45ddea31842aaf, type: 3}
       propertyPath: m_LocalPosition.z
@@ -31747,7 +31611,6 @@ GameObject:
   - component: {fileID: 1167544770}
   - component: {fileID: 1167544774}
   - component: {fileID: 1167544773}
-  - component: {fileID: 1167544772}
   - component: {fileID: 1167544771}
   m_Layer: 0
   m_Name: RiserCardChoice-m2
@@ -31765,8 +31628,8 @@ Transform:
   m_GameObject: {fileID: 1167544769}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.39999998, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 2.059, y: -1.349, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2001550138}
@@ -31800,22 +31663,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1167544772
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1167544769}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1288843607}
-  orbitRadius: 1.8
-  orbitSpeed: 20
-  startingAngle: 90
 --- !u!65 &1167544773
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32164,7 +32011,6 @@ GameObject:
   - component: {fileID: 1208081287}
   - component: {fileID: 1208081291}
   - component: {fileID: 1208081290}
-  - component: {fileID: 1208081288}
   - component: {fileID: 1208081292}
   m_Layer: 0
   m_Name: M2SSDChoice
@@ -32182,30 +32028,14 @@ Transform:
   m_GameObject: {fileID: 1208081286}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.494, y: -0.07, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 899232707}
   - {fileID: 431037314}
   m_Father: {fileID: 1520893896}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1208081288
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1208081286}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 251857805}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 270
 --- !u!65 &1208081290
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32601,7 +32431,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1366293721}
   - component: {fileID: 1366293725}
-  - component: {fileID: 1366293724}
   - component: {fileID: 1366293723}
   - component: {fileID: 1366293722}
   m_Layer: 0
@@ -32620,8 +32449,8 @@ Transform:
   m_GameObject: {fileID: 1366293720}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.136, y: -0.219, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 2.074, y: -0.2, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 269414851}
@@ -32670,22 +32499,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1366293724
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1366293720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1901737246}
-  orbitRadius: 1.8
-  orbitSpeed: 20
-  startingAngle: 270
 --- !u!65 &1366293725
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -33007,8 +32820,8 @@ Transform:
   m_GameObject: {fileID: 1401041169}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 1.01, z: -0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalPosition: {x: 0.028, y: 1.816, z: -0.1}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1520893896}
@@ -37821,7 +37634,6 @@ GameObject:
   - component: {fileID: 1403896061}
   - component: {fileID: 1403896065}
   - component: {fileID: 1403896064}
-  - component: {fileID: 1403896063}
   - component: {fileID: 1403896062}
   m_Layer: 0
   m_Name: SuperchipChoice
@@ -37839,8 +37651,8 @@ Transform:
   m_GameObject: {fileID: 1403896060}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -2.059, y: -1.054, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1999565843}
@@ -37874,22 +37686,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1403896063
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1403896060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1679135763}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 90
 --- !u!65 &1403896064
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -38184,7 +37980,6 @@ GameObject:
   - component: {fileID: 1431808381}
   - component: {fileID: 1431808385}
   - component: {fileID: 1431808384}
-  - component: {fileID: 1431808383}
   - component: {fileID: 1431808382}
   m_Layer: 0
   m_Name: RiserCardChoice
@@ -38202,8 +37997,8 @@ Transform:
   m_GameObject: {fileID: 1431808380}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.186, y: 0.389, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.886, y: -1.38, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1935189256}
@@ -38237,22 +38032,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1431808383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1431808380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 138310325}
-  orbitRadius: 1.8
-  orbitSpeed: 20
-  startingAngle: 90
 --- !u!65 &1431808384
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -38299,15 +38078,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalScale.x
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalScale.y
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalScale.z
-      value: 50
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalPosition.x
@@ -38315,11 +38094,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 1.84
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ea69900f1c04a834292c618d0eba57de, type: 3}
       propertyPath: m_LocalRotation.w
@@ -38384,7 +38163,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1466354378
 Transform:
   m_ObjectHideFlags: 0
@@ -38791,7 +38570,6 @@ GameObject:
   - component: {fileID: 1570229851}
   - component: {fileID: 1570229849}
   - component: {fileID: 1570229852}
-  - component: {fileID: 1570229853}
   m_Layer: 0
   m_Name: MotherboardChoice
   m_TagString: Untagged
@@ -38808,8 +38586,8 @@ Transform:
   m_GameObject: {fileID: 1570229847}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.2, y: 0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.58, y: -0.25, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 281423492}
@@ -38879,22 +38657,6 @@ MonoBehaviour:
   itemID: motherboard_label
   heatsinkSmoke: {fileID: 0}
   PlaneQuadTransform: {fileID: 793489519}
---- !u!114 &1570229853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1570229847}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 321072616}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 180
 --- !u!1001 &1584880228
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38986,7 +38748,6 @@ GameObject:
   - component: {fileID: 1590827968}
   - component: {fileID: 1590827972}
   - component: {fileID: 1590827971}
-  - component: {fileID: 1590827969}
   - component: {fileID: 1590827973}
   m_Layer: 0
   m_Name: HeatsinkChoice
@@ -39004,30 +38765,14 @@ Transform:
   m_GameObject: {fileID: 1590827967}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.06, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1.449, y: -0.873, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1675196764}
   - {fileID: 1675993910}
   m_Father: {fileID: 1520893896}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1590827969
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1590827967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 496439889}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 180
 --- !u!65 &1590827971
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39134,7 +38879,6 @@ GameObject:
   - component: {fileID: 1620812191}
   - component: {fileID: 1620812195}
   - component: {fileID: 1620812194}
-  - component: {fileID: 1620812192}
   - component: {fileID: 1620812196}
   m_Layer: 0
   m_Name: RiserCardChoice
@@ -39152,30 +38896,14 @@ Transform:
   m_GameObject: {fileID: 1620812190}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -1.899, y: -1.381, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 781725799}
   - {fileID: 799142765}
   m_Father: {fileID: 1520893896}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1620812192
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1620812190}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 178555445}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 90
 --- !u!65 &1620812194
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39725,7 +39453,6 @@ GameObject:
   - component: {fileID: 1723772223}
   - component: {fileID: 1723772227}
   - component: {fileID: 1723772226}
-  - component: {fileID: 1723772225}
   - component: {fileID: 1723772224}
   m_Layer: 0
   m_Name: HeatsinkChoice
@@ -39743,8 +39470,8 @@ Transform:
   m_GameObject: {fileID: 1723772222}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.060000002, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.16, y: -0.815, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1133769512}
@@ -39778,22 +39505,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1723772225
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1723772222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 2051703331}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 180
 --- !u!65 &1723772226
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45093,7 +44804,6 @@ GameObject:
   - component: {fileID: 1754922647}
   - component: {fileID: 1754922651}
   - component: {fileID: 1754922650}
-  - component: {fileID: 1754922649}
   - component: {fileID: 1754922648}
   m_Layer: 0
   m_Name: HeatsinkChoice
@@ -45111,8 +44821,8 @@ Transform:
   m_GameObject: {fileID: 1754922646}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.5, y: -0.060000002, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.164, y: -0.815, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1140177676}
@@ -45146,22 +44856,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1754922649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1754922646}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1074034735}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 180
 --- !u!65 &1754922650
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45783,7 +45477,6 @@ GameObject:
   - component: {fileID: 1884217121}
   - component: {fileID: 1884217125}
   - component: {fileID: 1884217124}
-  - component: {fileID: 1884217123}
   - component: {fileID: 1884217122}
   m_Layer: 0
   m_Name: InfiniBandChoice
@@ -45801,8 +45494,8 @@ Transform:
   m_GameObject: {fileID: 1884217120}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1.117, y: -0.7, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 953780152}
@@ -45836,22 +45529,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1884217123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1884217120}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 1045606359}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 0
 --- !u!65 &1884217124
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45996,7 +45673,6 @@ GameObject:
   - component: {fileID: 1902341979}
   - component: {fileID: 1902341983}
   - component: {fileID: 1902341982}
-  - component: {fileID: 1902341981}
   - component: {fileID: 1902341980}
   m_Layer: 0
   m_Name: M2SSDChoice
@@ -46014,8 +45690,8 @@ Transform:
   m_GameObject: {fileID: 1902341978}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.79, y: -0.1, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2110560220}
@@ -46049,22 +45725,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1902341981
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1902341978}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 218117229}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 270
 --- !u!65 &1902341982
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46403,7 +46063,6 @@ GameObject:
   - component: {fileID: 1936804082}
   - component: {fileID: 1936804086}
   - component: {fileID: 1936804085}
-  - component: {fileID: 1936804084}
   - component: {fileID: 1936804083}
   m_Layer: 0
   m_Name: RiserCardChoice
@@ -46421,8 +46080,8 @@ Transform:
   m_GameObject: {fileID: 1936804081}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.39999998, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 2.067, y: -1.365, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1935349057}
@@ -46456,22 +46115,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1936804084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1936804081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 716745674}
-  orbitRadius: 1.8
-  orbitSpeed: 20
-  startingAngle: 90
 --- !u!65 &1936804085
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46519,7 +46162,6 @@ GameObject:
   - component: {fileID: 1939985768}
   - component: {fileID: 1939985772}
   - component: {fileID: 1939985771}
-  - component: {fileID: 1939985770}
   - component: {fileID: 1939985769}
   m_Layer: 0
   m_Name: InfiniBandChoice
@@ -46537,8 +46179,8 @@ Transform:
   m_GameObject: {fileID: 1939985767}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.136, y: -0.719, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2074949995}
@@ -46572,22 +46214,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1939985770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939985767}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 174881888}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 0
 --- !u!65 &1939985771
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -46640,7 +46266,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1955267983
 Transform:
   m_ObjectHideFlags: 0
@@ -47607,7 +47233,6 @@ GameObject:
   - component: {fileID: 2040386272}
   - component: {fileID: 2040386276}
   - component: {fileID: 2040386275}
-  - component: {fileID: 2040386274}
   - component: {fileID: 2040386273}
   m_Layer: 0
   m_Name: MotherboardChoice
@@ -47625,8 +47250,8 @@ Transform:
   m_GameObject: {fileID: 2040386271}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.4, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.774, y: -0.2, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1044136736}
@@ -47660,22 +47285,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2040386274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2040386271}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 183117351}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 270
 --- !u!65 &2040386275
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48269,7 +47878,6 @@ GameObject:
   - component: {fileID: 2094496086}
   - component: {fileID: 2094496085}
   - component: {fileID: 2094496083}
-  - component: {fileID: 2094496087}
   m_Layer: 0
   m_Name: InfiniBandChoice
   m_TagString: Untagged
@@ -48286,8 +47894,8 @@ Transform:
   m_GameObject: {fileID: 2094496081}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1.12, y: -0.78, z: 0}
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1406362519}
@@ -48357,22 +47965,6 @@ MonoBehaviour:
   itemID: infiniband_label
   heatsinkSmoke: {fileID: 0}
   PlaneQuadTransform: {fileID: 793489519}
---- !u!114 &2094496087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2094496081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e7edf9ddd77bf48a71f4971e7ac907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  centerTarget: {fileID: 210990999}
-  orbitRadius: 1.75
-  orbitSpeed: 20
-  startingAngle: 0
 --- !u!1001 &2095197437
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48453,27 +48045,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.00031
+      value: 0.00045
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.0003
+      value: 0.00045
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.0003
+      value: 0.00045
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.2
+      value: 1.84
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b6caf7ec4dfe0d34d9e2f36287e684bf, type: 3}
       propertyPath: m_LocalRotation.w
@@ -48971,8 +48563,8 @@ Transform:
   m_GameObject: {fileID: 2141594489}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.01, y: 0.04, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 493193921}
