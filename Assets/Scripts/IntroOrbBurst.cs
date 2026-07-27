@@ -8,6 +8,9 @@ public class IntroOrbBurst : MonoBehaviour
     public GameObject innerGlowObject;
     public Transform innerGlowTransform;
 
+    [Header("Additional Intro Object")]
+    public GameObject introImageObject;
+
     [Header("Timing")]
     public float orbFadeDuration = 0.65f;
     public float glowGrowDuration = 0.65f;
@@ -37,6 +40,8 @@ public class IntroOrbBurst : MonoBehaviour
 
     public IEnumerator PlayBurstThenReveal(GameObject revealObject)
     {
+        ResetIntro();
+
         if (innerGlowObject == null || innerGlowTransform == null)
         {
             yield break;
@@ -45,6 +50,11 @@ public class IntroOrbBurst : MonoBehaviour
         if (revealObject != null)
         {
             revealObject.SetActive(false);
+        }
+
+        if (introImageObject != null)
+        {
+            introImageObject.SetActive(false);
         }
 
         innerGlowObject.SetActive(true);
@@ -167,6 +177,29 @@ public class IntroOrbBurst : MonoBehaviour
                     material.color = color;
                 }
             }
+        }
+    }
+
+    public void ResetIntro()
+    {
+        StopAllCoroutines();
+
+        if (innerGlowTransform != null)
+        {
+            innerGlowTransform.localScale = originalGlowScale;
+            innerGlowTransform.localPosition = originalGlowLocalPosition;
+        }
+
+        if (innerGlowObject != null)
+        {
+            SetObjectAlpha(innerGlowObject, 0f);
+            innerGlowObject.SetActive(false);
+        }
+
+        if (talkingOrbObject != null)
+        {
+            talkingOrbObject.SetActive(true);
+            SetObjectAlpha(talkingOrbObject, 1f);
         }
     }
 }

@@ -213,6 +213,14 @@ public class BrokenCityPieces : MonoBehaviour
     }
 
 
+    public void ResetCity()
+    {
+        StopAllCoroutines();
+        isRepairing = false;
+        isBroken = true;
+    }
+
+
     public void RepairCity()
     {
         if (!isBroken || isRepairing)

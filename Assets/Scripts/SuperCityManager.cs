@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 // SuperCityManager controls changing between scenes
 
@@ -85,7 +86,6 @@ public class SuperCityManager : MonoBehaviour
     // Parent object holding the broken city version
     public GameObject brokenPlaneObject;
 
-
     [Header("Transition Flash")]
 
     // Optional flash effect between analogy scene and placement scene
@@ -164,6 +164,20 @@ public class SuperCityManager : MonoBehaviour
     private bool hardwarePlacementCompleted = false;
 
     private Vector3[] originalCityAnalogyPositions;
+    private Vector3[] originalPlacementGroupPositions;
+
+    private class TransformHomeState
+    {
+        public Transform transform;
+        public Transform parent;
+        public Vector3 localPosition;
+        public Quaternion localRotation;
+        public Vector3 localScale;
+        public bool activeSelf;
+    }
+
+    private readonly List<TransformHomeState> sceneTransformHomeStates =
+        new List<TransformHomeState>();
 
     private Vector3[] finalOriginalOffsets;
     private Vector3[] finalOriginalPositions;
@@ -177,6 +191,20 @@ public class SuperCityManager : MonoBehaviour
     private bool analogyVisualsFinished = false;
     private bool analogySolved = false;
 
+    private bool introIsPlaying = false;
+
+    private class AnswerHomeState
+    {
+        public ZDraggableItem item;
+        public Transform parent;
+        public Vector3 localPosition;
+        public Quaternion localRotation;
+        public Vector3 localScale;
+    }
+
+    private readonly List<AnswerHomeState> answerHomeStates =
+        new List<AnswerHomeState>();
+
     // Runs once when the scene begins
     void Start()
     {
@@ -188,17 +216,37 @@ public class SuperCityManager : MonoBehaviour
         {
             if (cityAnalogies[i] != null)
             {
-                // Used to reset world positions when analogy starts again
                 originalCityAnalogyPositions[i] = cityAnalogies[i].transform.position;
             }
         }
+
+        // Home positions must be saved
+        originalPlacementGroupPositions = new Vector3[placementGroups.Length];
+
+        for (int i = 0; i < placementGroups.Length; i++)
+        {
+            if (placementGroups[i] != null)
+            {
+                originalPlacementGroupPositions[i] = placementGroups[i].transform.position;
+            }
+        }
+
+        StoreSceneTransformHomeStates();
+        StoreAnswerHomeStates();
 
         // Hide everything at the very beginning
         HideAll();
 
         StoreFinalOriginalPositions();
+    }
 
-        // Start the intro - glowing orb
+    public void BeginQuiz()
+    {
+        ResetEntireQuiz();
+        HideAll();
+
+        introIsPlaying = true;
+
         StartCoroutine(PlayIntroThenStartSceneOne());
     }
 
@@ -265,7 +313,14 @@ public class SuperCityManager : MonoBehaviour
     // Handles the intro sequence
     private IEnumerator PlayIntroThenStartSceneOne()
     {
+        introIsPlaying = true;
+
         Debug.Log("Intro started.");
+
+        if (explanationAudioSource != null)
+        {
+            explanationAudioSource.Stop();
+        }
 
         if (introLayer != null)
         {
@@ -276,6 +331,14 @@ public class SuperCityManager : MonoBehaviour
         {
             cityLayer.SetActive(false);
         }
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        HideAllCityAnalogies();
+        HideAllPlacementGroups();
 
         yield return new WaitForSeconds(introDuration);
 
@@ -324,6 +387,13 @@ public class SuperCityManager : MonoBehaviour
 
         foreach (Transform child in firstAnalogy.transform)
         {
+            if (repairedCityModel != null &&
+                child.gameObject == repairedCityModel)
+            {
+                child.gameObject.SetActive(false);
+                continue;
+            }
+
             child.gameObject.SetActive(true);
         }
 
@@ -337,6 +407,16 @@ public class SuperCityManager : MonoBehaviour
         else
         {
             firstAnalogy.SetActive(true);
+        }
+
+        if (repairedCityModel != null)
+        {
+            repairedCityModel.SetActive(false);
+        }
+
+        if (brokenPlaneObject != null)
+        {
+            brokenPlaneObject.SetActive(true);
         }
 
         if (introLayer != null)
@@ -360,6 +440,8 @@ public class SuperCityManager : MonoBehaviour
         brokenCityRepairStarted = false;
         analogyVisualsFinished = false;
         analogySolved = false;
+
+        introIsPlaying = false;
 
         StartCoroutine(PlayAnalogyAudioForCurrentPhase());
 
@@ -412,6 +494,15 @@ public class SuperCityManager : MonoBehaviour
         // Put first analogy directly in its normal middle position
         firstAnalogy.transform.position = originalCityAnalogyPositions[currentPhase];
         firstAnalogy.SetActive(true);
+        if (repairedCityModel != null)
+        {
+            repairedCityModel.SetActive(false);
+        }
+
+        if (brokenPlaneObject != null)
+        {
+            brokenPlaneObject.SetActive(true);
+        }
 
         foreach (Transform child in firstAnalogy.transform)
         {
@@ -674,8 +765,7 @@ public class SuperCityManager : MonoBehaviour
 
     // Controls what happens after the user solves an analogy
     //
-    // Marks transition as running,
-    // slides analogy away, starts placement layer
+    // Marks transition as running, slides analogy away, starts placement layer
     private IEnumerator AnalogySolvedRoutine()
     {
         phaseTransitionRunning = true;
@@ -697,6 +787,11 @@ public class SuperCityManager : MonoBehaviour
 
     private IEnumerator PlayPlacementAudioForCurrentPhase()
     {
+        explanationAudioSource.Stop();
+        explanationAudioSource.clip =
+            placementExplanationClips[currentPhase];
+        explanationAudioSource.Play();
+
         placementAudioFinished = false;
 
         if (explanationAudioSource != null &&
@@ -723,6 +818,12 @@ public class SuperCityManager : MonoBehaviour
 
     private IEnumerator PlayAnalogyAudioForCurrentPhase()
     {
+
+        explanationAudioSource.Stop();
+        explanationAudioSource.clip =
+            placementExplanationClips[currentPhase];
+        explanationAudioSource.Play();
+
         analogyAudioFinished = false;
         analogySolvedWhileAudioPlaying = false;
 
@@ -839,11 +940,13 @@ public class SuperCityManager : MonoBehaviour
             yield break;
         }
 
-        Vector3 finalPosition = currentPlacementGroup.transform.position;
+        Vector3 finalPosition = originalPlacementGroupPositions[currentPhase];
         Vector3 startPosition = finalPosition + new Vector3(0f, -placementSlideUpDistance, 0f);
 
         currentPlacementGroup.transform.position = startPosition;
         currentPlacementGroup.SetActive(true);
+
+        RestartAnimatorsUnder(currentPlacementGroup);
 
         yield return StartCoroutine(SlideObject(
             currentPlacementGroup,
@@ -1079,6 +1182,8 @@ public class SuperCityManager : MonoBehaviour
             child.gameObject.SetActive(true);
         }
 
+        ResetCurrentAnalogyChoices();
+
         // Books orbiting animation
         if (bookOrbitGroups != null &&
             currentPhase >= 0 &&
@@ -1104,10 +1209,83 @@ public class SuperCityManager : MonoBehaviour
         brokenCityRepairStarted = false;
         analogyVisualsFinished = false;
         analogySolved = false;
+        analogyAudioFinished = false;
+
+        phaseTransitionRunning = false;
+
+        ResetCurrentAnalogyChoices();
 
         StartCoroutine(PlayAnalogyAudioForCurrentPhase());
 
         Debug.Log("Starting analogy phase " + currentPhase);
+    }
+
+    private void ResetCurrentAnalogyChoices()
+    {
+        if (cityAnalogies == null ||
+            currentPhase < 0 ||
+            currentPhase >= cityAnalogies.Length ||
+            cityAnalogies[currentPhase] == null)
+        {
+            return;
+        }
+
+        GameObject analogy = cityAnalogies[currentPhase];
+
+        ZDraggableItem[] choices =
+            analogy.GetComponentsInChildren<ZDraggableItem>(true);
+
+        foreach (ZDraggableItem choice in choices)
+        {
+            if (choice == null)
+            {
+                continue;
+            }
+
+            choice.gameObject.SetActive(true);
+            choice.enabled = true;
+
+            Collider[] colliders =
+                choice.GetComponentsInChildren<Collider>(true);
+
+            foreach (Collider col in colliders)
+            {
+                if (col != null)
+                {
+                    col.enabled = true;
+                }
+            }
+
+            Rigidbody[] rigidbodies =
+                choice.GetComponentsInChildren<Rigidbody>(true);
+
+            foreach (Rigidbody rb in rigidbodies)
+            {
+                if (rb == null)
+                {
+                    continue;
+                }
+
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+
+            choice.ResetPosition();
+
+            Debug.Log(
+                "Enabled answer: " + choice.name +
+                " | Script: " + choice.enabled +
+                " | Active: " + choice.gameObject.activeInHierarchy +
+                " | Colliders: " + colliders.Length
+            );
+        }
+
+        Debug.Log(
+            "Prepared " + choices.Length +
+            " answers for phase " + currentPhase
+        );
     }
 
     private void SetObjectGreenGlow(GameObject obj)
@@ -1248,4 +1426,512 @@ public class SuperCityManager : MonoBehaviour
             finalScoreText.gameObject.SetActive(false);
         }
     }
+
+    public void ReplayCurrentScene()
+    {
+        StopAllCoroutines();
+
+        if (explanationAudioSource != null)
+        {
+            explanationAudioSource.Stop();
+            explanationAudioSource.clip = null;
+        }
+
+        if (introIsPlaying || (introLayer != null && introLayer.activeSelf))
+        {
+            ReplayIntro();
+            return;
+        }
+
+        phaseTransitionRunning = false;
+
+        bool placementIsShowing =
+            placementLayer != null &&
+            placementLayer.activeSelf;
+
+        if (placementIsShowing)
+        {
+            ReplayCurrentPlacement();
+        }
+        else
+        {
+            ReplayCurrentAnalogy();
+        }
+    }
+
+    private void ReplayIntro()
+    {
+        StopAllCoroutines();
+
+        if (explanationAudioSource != null)
+        {
+            explanationAudioSource.Stop();
+            explanationAudioSource.clip = null;
+        }
+
+        if (introOrbBurst != null)
+        {
+            introOrbBurst.ResetIntro();
+        }
+
+        HideAllCityAnalogies();
+        ResetCurrentPlacementForReplay();
+        HideAllPlacementGroups();
+
+        if (cityLayer != null)
+        {
+            cityLayer.SetActive(false);
+        }
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        if (introLayer != null)
+        {
+            introLayer.SetActive(false);
+        }
+
+        introIsPlaying = false;
+        phaseTransitionRunning = false;
+
+        StartCoroutine(PlayIntroThenStartSceneOne());
+
+        Debug.Log("Replaying intro.");
+    }
+        
+
+    private void ReplayCurrentAnalogy()
+    {
+        HideAllCityAnalogies();
+        HideAllPlacementGroups();
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        if (cityLayer != null)
+        {
+            cityLayer.SetActive(true);
+        }
+
+        currentAnalogyHadWrongGuess = false;
+        analogyScoreCountedThisPhase = false;
+        analogyCorrectVisualsStarted = false;
+        brokenCityRepairStarted = false;
+        analogyVisualsFinished = false;
+        analogySolved = false;
+        analogyAudioFinished = false;
+        phaseTransitionRunning = false;
+
+        StartAnalogyPhase(currentPhase);
+
+        if (currentPhase == brokenCityPhaseIndex && brokenCityPieces != null)
+        {
+            brokenCityPieces.ResetCity();
+        }
+
+        ResetCurrentAnalogyChoices();
+
+        StartCoroutine(PlayAnalogyAudioForCurrentPhase());
+
+        Debug.Log("Replaying analogy phase " + currentPhase);
+    }
+
+    private void ReplayCurrentPlacement()
+    {
+        HideAllCityAnalogies();
+        ResetCurrentPlacementForReplay();
+        HideAllPlacementGroups();
+
+        if (cityLayer != null)
+        {
+            cityLayer.SetActive(false);
+        }
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(true);
+        }
+
+        placementAudioFinished = false;
+        hardwarePlacementCompleted = false;
+        phaseTransitionRunning = false;
+
+        StartCoroutine(StartPlacementLayer());
+
+        Debug.Log("Replaying placement phase " + currentPhase);
+    }
+
+    public void ReturnToHome()
+    {
+        ResetEntireQuiz();
+        HideAll();
+
+        Debug.Log("Quiz reset and returned home.");
+    }
+
+    private void ResetEntireQuiz()
+    {
+        StopAllCoroutines();
+
+        introIsPlaying = false;
+
+        if (explanationAudioSource != null)
+        {
+            explanationAudioSource.Stop();
+            explanationAudioSource.clip = null;
+        }
+
+        currentPhase = 0;
+        analogyCorrectFirstTryScore = 0;
+
+        phaseTransitionRunning = false;
+
+        currentAnalogyHadWrongGuess = false;
+        analogyScoreCountedThisPhase = false;
+        analogyCorrectVisualsStarted = false;
+        brokenCityRepairStarted = false;
+
+        analogyAudioFinished = false;
+        analogyVisualsFinished = false;
+        analogySolved = false;
+
+        placementAudioFinished = false;
+        hardwarePlacementCompleted = false;
+
+        finalOrbitRunning = false;
+        finalOrbitAngle = 0f;
+
+        if (introOrbBurst != null)
+        {
+            introOrbBurst.ResetIntro();
+        }
+
+        // Restore every animated/moved object before anything is shown again
+        RestoreSceneTransformsAndAnimators();
+
+        if (brokenCityPieces != null)
+        {
+            brokenCityPieces.ResetCity();
+        }
+
+        RestoreAllAnswerChoices();
+
+        for (int i = 0; i < cityAnalogies.Length; i++)
+        {
+            if (cityAnalogies[i] == null)
+            {
+                continue;
+            }
+
+            cityAnalogies[i].transform.position =
+                originalCityAnalogyPositions[i];
+
+            cityAnalogies[i].SetActive(false);
+        }
+
+        if (placementGroups != null && originalPlacementGroupPositions != null)
+        {
+            for (int i = 0; i < placementGroups.Length; i++)
+            {
+                if (placementGroups[i] != null && i < originalPlacementGroupPositions.Length)
+                {
+                    placementGroups[i].transform.position = originalPlacementGroupPositions[i];
+                }
+            }
+        }
+
+        HideAllPlacementGroups();
+
+        if (repairedCityModel != null)
+        {
+            repairedCityModel.SetActive(false);
+        }
+
+        if (brokenPlaneObject != null)
+        {
+            brokenPlaneObject.SetActive(true);
+        }
+
+        if (transitionFlashObject != null)
+        {
+            transitionFlashObject.SetActive(false);
+        }
+
+        HideFinalCelebrationObjects();
+    }
+
+    private void StoreSceneTransformHomeStates()
+    {
+        sceneTransformHomeStates.Clear();
+
+        HashSet<Transform> storedTransforms = new HashSet<Transform>();
+
+        StoreRootTransformStates(cityAnalogies, storedTransforms);
+        StoreRootTransformStates(placementGroups, storedTransforms);
+
+        if (brokenPlaneObject != null)
+        {
+            StoreTransformTree(brokenPlaneObject.transform, storedTransforms);
+        }
+
+        if (repairedCityModel != null)
+        {
+            StoreTransformTree(repairedCityModel.transform, storedTransforms);
+        }
+    }
+
+    private void StoreRootTransformStates(GameObject[] roots, HashSet<Transform> storedTransforms)
+    {
+        if (roots == null)
+        {
+            return;
+        }
+
+        foreach (GameObject root in roots)
+        {
+            if (root != null)
+            {
+                StoreTransformTree(root.transform, storedTransforms);
+            }
+        }
+    }
+
+    private void StoreTransformTree(Transform root, HashSet<Transform> storedTransforms)
+    {
+        if (root == null || storedTransforms.Contains(root))
+        {
+            return;
+        }
+
+        storedTransforms.Add(root);
+
+        sceneTransformHomeStates.Add(new TransformHomeState
+        {
+            transform = root,
+            parent = root.parent,
+            localPosition = root.localPosition,
+            localRotation = root.localRotation,
+            localScale = root.localScale,
+            activeSelf = root.gameObject.activeSelf
+        });
+
+        foreach (Transform child in root)
+        {
+            StoreTransformTree(child, storedTransforms);
+        }
+    }
+
+    private void RestoreSceneTransformsAndAnimators()
+    {
+        foreach (TransformHomeState state in sceneTransformHomeStates)
+        {
+            if (state == null || state.transform == null)
+            {
+                continue;
+            }
+
+            if (state.parent != null && state.transform.parent != state.parent)
+            {
+                state.transform.SetParent(state.parent, false);
+            }
+
+            state.transform.localPosition = state.localPosition;
+            state.transform.localRotation = state.localRotation;
+            state.transform.localScale = state.localScale;
+            state.transform.gameObject.SetActive(state.activeSelf);
+        }
+
+        ResetAnimatorsUnder(cityLayer);
+        ResetAnimatorsUnder(placementLayer);
+        ResetAnimatorsUnder(introLayer);
+    }
+
+    private void ResetAnimatorsUnder(GameObject root)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        Animator[] animators = root.GetComponentsInChildren<Animator>(true);
+
+        foreach (Animator animator in animators)
+        {
+            if (animator == null)
+            {
+                continue;
+            }
+
+            animator.Rebind();
+            animator.Update(0f);
+        }
+    }
+
+    private void RestartAnimatorsUnder(GameObject root)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        Animator[] animators = root.GetComponentsInChildren<Animator>(true);
+
+        foreach (Animator animator in animators)
+        {
+            if (animator == null)
+            {
+                continue;
+            }
+
+            animator.enabled = true;
+            animator.Rebind();
+            animator.Update(0f);
+            animator.Play(0, 0, 0f);
+            animator.Update(0f);
+        }
+    }
+
+
+    private void ResetCurrentPlacementForReplay()
+    {
+        if (placementGroups == null ||
+            currentPhase < 0 ||
+            currentPhase >= placementGroups.Length ||
+            placementGroups[currentPhase] == null)
+        {
+            return;
+        }
+
+        Transform placementRoot = placementGroups[currentPhase].transform;
+
+        foreach (TransformHomeState state in sceneTransformHomeStates)
+        {
+            if (state == null || state.transform == null)
+            {
+                continue;
+            }
+
+            if (state.transform != placementRoot && !state.transform.IsChildOf(placementRoot))
+            {
+                continue;
+            }
+
+            if (state.parent != null && state.transform.parent != state.parent)
+            {
+                state.transform.SetParent(state.parent, false);
+            }
+
+            state.transform.localPosition = state.localPosition;
+            state.transform.localRotation = state.localRotation;
+            state.transform.localScale = state.localScale;
+            state.transform.gameObject.SetActive(state.activeSelf);
+        }
+
+        if (originalPlacementGroupPositions != null &&
+            currentPhase < originalPlacementGroupPositions.Length)
+        {
+            placementGroups[currentPhase].transform.position =
+                originalPlacementGroupPositions[currentPhase];
+        }
+
+        ResetAnimatorsUnder(placementGroups[currentPhase]);
+    }
+
+    private void StoreAnswerHomeStates()
+    {
+        answerHomeStates.Clear();
+
+        if (cityAnalogies == null)
+        {
+            return;
+        }
+
+        foreach (GameObject analogy in cityAnalogies)
+        {
+            if (analogy == null)
+            {
+                continue;
+            }
+
+            ZDraggableItem[] choices =
+                analogy.GetComponentsInChildren<ZDraggableItem>(true);
+
+            foreach (ZDraggableItem choice in choices)
+            {
+                if (choice == null)
+                {
+                    continue;
+                }
+
+                AnswerHomeState state = new AnswerHomeState
+                {
+                    item = choice,
+                    parent = choice.transform.parent,
+                    localPosition = choice.transform.localPosition,
+                    localRotation = choice.transform.localRotation,
+                    localScale = choice.transform.localScale
+                };
+
+                answerHomeStates.Add(state);
+            }
+        }
+    }
+
+    private void RestoreAllAnswerChoices()
+    {
+        foreach (AnswerHomeState state in answerHomeStates)
+        {
+            if (state == null || state.item == null)
+            {
+                continue;
+            }
+
+            Transform itemTransform = state.item.transform;
+
+            if (state.parent != null &&
+                itemTransform.parent != state.parent)
+            {
+                itemTransform.SetParent(state.parent, false);
+            }
+
+            itemTransform.localPosition = state.localPosition;
+            itemTransform.localRotation = state.localRotation;
+            itemTransform.localScale = state.localScale;
+
+            state.item.enabled = true;
+            state.item.gameObject.SetActive(true);
+
+            Collider[] colliders =
+                state.item.GetComponentsInChildren<Collider>(true);
+
+            foreach (Collider col in colliders)
+            {
+                if (col != null)
+                {
+                    col.enabled = true;
+                }
+            }
+
+            Rigidbody[] rigidbodies =
+                state.item.GetComponentsInChildren<Rigidbody>(true);
+
+            foreach (Rigidbody rb in rigidbodies)
+            {
+                if (rb == null)
+                {
+                    continue;
+                }
+
+                rb.isKinematic = true;
+                rb.useGravity = false;
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
+    }
+
 }

@@ -3,341 +3,446 @@ using UnityEngine.EventSystems;
 using zSpace.Core.EventSystems;
 using zSpace.Core.Input;
 
-
-
-
-// Makes an object draggable with the zSpace stylus (for hardware pieces)
-//
-// Lets the user grab and drag the object, keeps the object locked on drag
-// plane, detects when the object is hovering over a drop target, checks if
-// correct target, triggers success/failure, and turns orbiting off while
-// dragging and back on if the answer is wrong
 public class ZDraggableItem :
-    ZPointerInteractable, IBeginDragHandler, IDragHandler, IEndDragHandler
+    ZPointerInteractable,
+    IPointerClickHandler,
+    IBeginDragHandler,
+    IDragHandler,
+    IEndDragHandler
 {
     [Header("Answer Setup")]
-
-
-    // Used to check for expected itemID
     public string itemID;
 
-
-
+    [Tooltip("Assign the ZDropTarget attached to the middle analogy object.")]
+    public ZDropTarget analogyTarget;
 
     [Header("Effects")]
-
-
     public GameObject heatsinkSmoke;
 
-
-
-
     [Header("Drag Plane")]
-
-
-    // Plane that controls where the object can move while dragging
     public Transform PlaneQuadTransform;
 
+    [Header("Drag Settings")]
+    public float minimumDragDistance = 0.01f;
 
-    // Object returns to this position if answered wrong
-    private Vector3 originalPosition;
+    private Transform originalParent;
+    private Vector3 originalLocalPosition;
+    private Quaternion originalLocalRotation;
 
-
-    private Quaternion originalRotation;
-
-
-
-
-    // This stores the offset between the stylus pointer and the object
-    // Helps the object keep the same position from the stylus as when grabbed
-    private Vector3 initialGrabOffset = Vector3.zero;
-
-
-    private bool originalIsKinematic = false;
-
-
-
-
-    // Stores the drop target the object is currently touching
-    // Checked by OnEndDrag
+    private Rigidbody rb;
+    private ZPointer capturedPointer;
     private ZDropTarget currentHoverTarget;
 
+    private Vector3 pointerStartPosition;
+    private Vector3 grabOffset;
+    private Vector3 pivotToVisualCenter;
 
-    // This stores the OrbitAroundTarget script, disabled when object grabbed
-    private OrbitAroundTarget orbitScript;
+    private bool homePositionStored;
+    private bool dragging;
+    private bool movedDuringDrag;
+    private bool answerHandled;
+    private bool suppressNextClick;
 
-
-
-
-    // Runs when this object first becomes active in the scene
-    void Start()
+    private void Awake()
     {
-        // Where the item returns if the user drops it incorrectly
-        originalPosition = transform.position;
+        rb = GetComponent<Rigidbody>();
 
-
-        originalRotation = transform.rotation;
-
-
-        // Disable OrbitAroundTarget script during dragging
-        orbitScript = GetComponent<OrbitAroundTarget>();
+        StoreHomePosition();
+        PreparePhysics();
     }
 
+    private void OnEnable()
+    {
+        StoreHomePosition();
 
+        answerHandled = false;
+        dragging = false;
+        movedDuringDrag = false;
+        suppressNextClick = false;
+        currentHoverTarget = null;
+        capturedPointer = null;
 
+        EnableColliders();
+        PreparePhysics();
+    }
 
-    // Tells zSpace how the object should be dragged
+    private void OnDisable()
+    {
+        ReleasePointer();
+
+        dragging = false;
+        movedDuringDrag = false;
+        currentHoverTarget = null;
+    }
+
+    private void StoreHomePosition()
+    {
+        if (homePositionStored)
+        {
+            return;
+        }
+
+        originalParent = transform.parent;
+        originalLocalPosition = transform.localPosition;
+        originalLocalRotation = transform.localRotation;
+
+        homePositionStored = true;
+    }
+
+    private void EnableColliders()
+    {
+        Collider[] colliders =
+            GetComponentsInChildren<Collider>(true);
+
+        foreach (Collider col in colliders)
+        {
+            if (col != null)
+            {
+                col.enabled = true;
+            }
+        }
+    }
+
+    private void PreparePhysics()
+    {
+        if (rb == null)
+        {
+            rb = GetComponent<Rigidbody>();
+        }
+
+        if (rb == null)
+        {
+            return;
+        }
+
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
     public override ZPointer.DragPolicy GetDragPolicy(ZPointer pointer)
     {
         return ZPointer.DragPolicy.LockToCustomPlane;
     }
 
-
-
-
-    // Tells zSpace which plane to use when dragging
-    // Math that defines a flat surface
     public override Plane GetDragPlane(ZPointer pointer)
     {
         if (PlaneQuadTransform != null)
         {
-            // PlaneQuadTransform.forward controls the direction the plane faces
-            // PlaneQuadTransform.position controls where the plane is located
             return new Plane(
                 PlaneQuadTransform.forward,
-                PlaneQuadTransform.position);
+                PlaneQuadTransform.position
+            );
         }
 
-
-
-
-        // No Plane Quad was assigned, use default drag plane from ZPointerInteractable
         return base.GetDragPlane(pointer);
     }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (answerHandled)
+        {
+            return;
+        }
 
+        if (suppressNextClick)
+        {
+            suppressNextClick = false;
+            return;
+        }
 
+        CheckAnswer(analogyTarget);
+    }
 
-    // Runs when the user first starts dragging the object
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Convert regular Unity pointer event data into zSpace pointer event data
-        ZPointerEventData pointerEventData = eventData as ZPointerEventData;
-
+        ZPointerEventData pointerEventData =
+            eventData as ZPointerEventData;
 
         if (pointerEventData == null ||
-            pointerEventData.button != PointerEventData.InputButton.Left)
+            pointerEventData.button != PointerEventData.InputButton.Left ||
+            answerHandled)
         {
             return;
         }
 
+        ReleasePointer();
 
-        // Turn off orbit script while dragging
-        if (orbitScript != null)
-        {
-            orbitScript.enabled = false;
-        }
+        capturedPointer = pointerEventData.Pointer;
+        capturedPointer.CapturePointer(gameObject);
 
+        Pose pointerPose =
+            pointerEventData.Pointer.EndPointWorldPose;
 
+        pointerStartPosition = pointerPose.position;
 
+        Vector3 visualCenter = GetVisualCenter();
 
-        // Get the world position and rotation of the stylus endpoint
-        Pose pose = pointerEventData.Pointer.EndPointWorldPose;
+        grabOffset = visualCenter - pointerPose.position;
+        pivotToVisualCenter = visualCenter - transform.position;
 
+        dragging = true;
+        movedDuringDrag = false;
+        currentHoverTarget = null;
 
-
-
-        // Calculate the offset between the object and the stylus grab point
-        initialGrabOffset =
-            Quaternion.Inverse(transform.rotation) *
-            (transform.position - pose.position);
-
-
-        Rigidbody rb = GetComponent<Rigidbody>();
-
-
-        if (rb != null)
-        {
-            originalIsKinematic = rb.isKinematic;
-
-
-            // The script controls movement when kinematic is on
-            rb.isKinematic = true;
-        }
-
-
-        // Stylus stays connected to this object while dragging
-        pointerEventData.Pointer.CapturePointer(gameObject);
+        PreparePhysics();
     }
 
-
-
-
-    // Runs every frame while the user is dragging the object
     public void OnDrag(PointerEventData eventData)
     {
-        ZPointerEventData pointerEventData = eventData as ZPointerEventData;
-
+        ZPointerEventData pointerEventData =
+            eventData as ZPointerEventData;
 
         if (pointerEventData == null ||
-            pointerEventData.button != PointerEventData.InputButton.Left)
+            pointerEventData.button != PointerEventData.InputButton.Left ||
+            answerHandled ||
+            !dragging)
         {
             return;
         }
 
+        Pose pointerPose =
+            pointerEventData.Pointer.EndPointWorldPose;
 
-        Pose pose = pointerEventData.Pointer.EndPointWorldPose;
+        float distanceMoved = Vector3.Distance(
+            pointerStartPosition,
+            pointerPose.position
+        );
 
+        if (!movedDuringDrag &&
+            distanceMoved < minimumDragDistance)
+        {
+            return;
+        }
 
+        movedDuringDrag = true;
 
+        Vector3 desiredVisualCenter =
+            pointerPose.position + grabOffset;
 
-        // Move the object to follow the stylus
         transform.position =
-            pose.position +
-            (transform.rotation * initialGrabOffset);
+            desiredVisualCenter - pivotToVisualCenter;
     }
 
-
-
-
-    // Runs when the user lets go of the object
     public void OnEndDrag(PointerEventData eventData)
     {
-        ZPointerEventData pointerEventData = eventData as ZPointerEventData;
-
+        ZPointerEventData pointerEventData =
+            eventData as ZPointerEventData;
 
         if (pointerEventData == null ||
-            pointerEventData.button != PointerEventData.InputButton.Left)
+            pointerEventData.button != PointerEventData.InputButton.Left ||
+            answerHandled)
         {
+            ReleasePointer();
             return;
         }
 
+        ReleasePointer();
 
-        // Release the captured pointer
-        pointerEventData.Pointer.CapturePointer(null);
+        dragging = false;
+        PreparePhysics();
 
-
-        Rigidbody rb = GetComponent<Rigidbody>();
-
-
-        // Restore original kinematic setting
-        if (rb != null)
+        if (!movedDuringDrag)
         {
-            rb.isKinematic = originalIsKinematic;
+            suppressNextClick = true;
+            CheckAnswer(analogyTarget);
+            return;
         }
 
+        suppressNextClick = true;
 
-        // Check if the object is currently touching a drop target
-        // currentHoverTarget is set by OnTriggerEnter
         if (currentHoverTarget != null)
         {
-            if (currentHoverTarget.expectedItemID == itemID)
-            {
-                currentHoverTarget.TriggerSuccess();
-
-
-                // Turn off smoke for heatsink
-                if (heatsinkSmoke != null)
-                {
-                    heatsinkSmoke.SetActive(false);
-                }
-
-
-                // Hide this draggable item
-                gameObject.SetActive(false);
-            }
-            else
-            {
-                currentHoverTarget.TriggerFailure();
-
-
-                ResetPosition();
-            }
+            CheckAnswer(currentHoverTarget);
         }
         else
         {
-            // Object not dropped on any target, return to original position
             ResetPosition();
         }
     }
 
-
-
-
-    // Runs when this object's trigger collider enters another trigger collider
-    // How the draggable item knows it is touching a drop zone
-    private void OnTriggerEnter(Collider other)
+    private Vector3 GetVisualCenter()
     {
-        // Check if the object we entered has a ZDropTarget script
-        ZDropTarget zone = other.GetComponent<ZDropTarget>();
+        Renderer[] renderers =
+            GetComponentsInChildren<Renderer>(true);
 
-
-
-
-        // If yes, store it as the current hover target for OnEndDrag to later
-        // check if this is the correct target
-        if (zone != null)
+        if (renderers.Length > 0)
         {
-            currentHoverTarget = zone;
+            Bounds bounds = renderers[0].bounds;
+
+            for (int i = 1; i < renderers.Length; i++)
+            {
+                if (renderers[i] != null)
+                {
+                    bounds.Encapsulate(renderers[i].bounds);
+                }
+            }
+
+            return bounds.center;
+        }
+
+        Collider[] colliders =
+            GetComponentsInChildren<Collider>(true);
+
+        if (colliders.Length > 0)
+        {
+            Bounds bounds = colliders[0].bounds;
+
+            for (int i = 1; i < colliders.Length; i++)
+            {
+                if (colliders[i] != null)
+                {
+                    bounds.Encapsulate(colliders[i].bounds);
+                }
+            }
+
+            return bounds.center;
+        }
+
+        return transform.position;
+    }
+
+    private void CheckAnswer(ZDropTarget target)
+    {
+        if (answerHandled)
+        {
+            return;
+        }
+
+        if (target == null)
+        {
+            Debug.LogWarning(
+                gameObject.name +
+                " does not have an analogy target assigned."
+            );
+
+            ResetPosition();
+            return;
+        }
+
+        if (target.expectedItemID == itemID)
+        {
+            answerHandled = true;
+
+            target.TriggerSuccess();
+
+            if (heatsinkSmoke != null)
+            {
+                heatsinkSmoke.SetActive(false);
+            }
+
+            ReleasePointer();
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            target.TriggerFailure();
+            ResetPosition();
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        ZDropTarget target =
+            other.GetComponent<ZDropTarget>();
 
+        if (target == null)
+        {
+            target = other.GetComponentInParent<ZDropTarget>();
+        }
 
+        if (target != null)
+        {
+            currentHoverTarget = target;
+        }
+    }
 
-    // This runs when this object's trigger collider exits another trigger collider
+    private void OnTriggerStay(Collider other)
+    {
+        ZDropTarget target =
+            other.GetComponent<ZDropTarget>();
+
+        if (target == null)
+        {
+            target = other.GetComponentInParent<ZDropTarget>();
+        }
+
+        if (target != null)
+        {
+            currentHoverTarget = target;
+        }
+    }
+
     private void OnTriggerExit(Collider other)
     {
-        ZDropTarget zone = other.GetComponent<ZDropTarget>();
+        ZDropTarget target =
+            other.GetComponent<ZDropTarget>();
 
+        if (target == null)
+        {
+            target = other.GetComponentInParent<ZDropTarget>();
+        }
 
-        // Clear currentHoverTarget if the zone left is the same one currently stored
-        if (zone != null && currentHoverTarget == zone)
+        if (target != null &&
+            currentHoverTarget == target)
         {
             currentHoverTarget = null;
         }
     }
 
-
-
-
-    // Snaps the object to a target transform (the snap point on the motherboard)
-    public void SnapToTarget(Transform targetTransform)
+    private void ReleasePointer()
     {
-        transform.position = targetTransform.position;
-
-
-        transform.rotation = targetTransform.rotation;
-
-
-        if (orbitScript != null)
+        if (capturedPointer == null)
         {
-            orbitScript.enabled = false;
+            return;
         }
 
-
-        // Remove ZDraggableItem so the object can no longer be dragged
-        Destroy(this);
+        capturedPointer.CapturePointer(null);
+        capturedPointer = null;
     }
 
-
-
-
-    // Sends the object back to its original starting position
-    // For when dropped on wrong target or no target
     public void ResetPosition()
     {
-        transform.position = originalPosition;
+        ReleasePointer();
 
+        transform.SetParent(originalParent, false);
+        transform.localPosition = originalLocalPosition;
+        transform.localRotation = originalLocalRotation;
 
-        transform.rotation = originalRotation;
+        dragging = false;
+        movedDuringDrag = false;
+        currentHoverTarget = null;
 
+        PreparePhysics();
+    }
 
-        // Turn orbiting back on
-        if (orbitScript != null)
+    public void ResetForNewPhase()
+    {
+        answerHandled = false;
+        suppressNextClick = false;
+
+        gameObject.SetActive(true);
+        enabled = true;
+
+        EnableColliders();
+        ResetPosition();
+    }
+
+    public void SnapToTarget(Transform targetTransform)
+    {
+        if (targetTransform == null)
         {
-            orbitScript.enabled = true;
+            return;
         }
+
+        ReleasePointer();
+
+        transform.position = targetTransform.position;
+        transform.rotation = targetTransform.rotation;
+
+        PreparePhysics();
+
+        enabled = false;
     }
 }
-
