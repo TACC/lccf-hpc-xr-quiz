@@ -23,6 +23,20 @@ public class BuildingDarkFilter : MonoBehaviour
 
     void Start()
     {
+        InitializeMaterial();
+        ResetFilter();
+    }
+
+    public void FadeToDim()
+    {
+        if (hasPlayed) return;
+
+        hasPlayed = true;
+        StartCoroutine(FadeRoutine());
+    }
+
+    private void InitializeMaterial()
+    {
         if (filterRenderer == null)
         {
             filterRenderer = GetComponent<Renderer>();
@@ -34,16 +48,20 @@ public class BuildingDarkFilter : MonoBehaviour
             return;
         }
 
-        filterMaterial = filterRenderer.material;
-        SetAlpha(startAlpha);
+        if (filterMaterial == null)
+        {
+            filterMaterial = filterRenderer.material;
+        }
     }
 
-    public void FadeToDim()
+    public void ResetFilter()
     {
-        if (hasPlayed) return;
+        StopAllCoroutines();
 
-        hasPlayed = true;
-        StartCoroutine(FadeRoutine());
+        hasPlayed = false;
+
+        InitializeMaterial();
+        SetAlpha(startAlpha);
     }
 
     private IEnumerator FadeRoutine()

@@ -23,6 +23,9 @@ public class PlacementDropTarget : MonoBehaviour
 
     private Material originalMaterial;
 
+    [Header("Installed Object")]
+    public GameObject installedObject;
+
     void Start()
     {
         if (snapPoint == null)
@@ -48,6 +51,11 @@ public class PlacementDropTarget : MonoBehaviour
             {
                 targetRenderer.enabled = false;
             }
+        }
+
+        if (installedObject != null)
+        {
+            installedObject.SetActive(false);
         }
     }
 
@@ -107,6 +115,11 @@ public class PlacementDropTarget : MonoBehaviour
 
         Debug.Log("Correct placement: " + expectedItemID);
 
+        if (installedObject != null)
+        {
+            installedObject.SetActive(true);
+        }
+
         if (superCityManager == null)
         {
             superCityManager = FindObjectOfType<SuperCityManager>();
@@ -119,6 +132,14 @@ public class PlacementDropTarget : MonoBehaviour
         else
         {
             Debug.LogWarning("SuperCityManager could not be found for " + gameObject.name);
+        }
+    }
+
+    public void ResetTarget()
+    {
+        if (installedObject != null)
+        {
+            installedObject.SetActive(false);
         }
     }
 }

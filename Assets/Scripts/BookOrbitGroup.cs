@@ -68,4 +68,19 @@ public class BookOrbitGroup : MonoBehaviour
 
         yield return new WaitForSeconds(duration);
     }
+
+    public void ResetAllBooks()
+    {
+        StopAllCoroutines();
+        RefreshBookOrbits();
+
+        foreach (BookPlanetOrbit orbit in bookOrbits)
+        {
+            if (orbit != null)
+            {
+                orbit.ResetOrbit();
+            }
+        }
+    }
+
 }

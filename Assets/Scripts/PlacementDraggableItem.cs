@@ -46,6 +46,8 @@ public class PlacementDraggableItem :
 
     private Quaternion startLocalRotation;
 
+    private bool startingPositionSaved = false;
+
 
     // Stores the offset between where the stylus grabs and the object's center
     private Vector3 initialGrabOffset = Vector3.zero;
@@ -65,15 +67,32 @@ public class PlacementDraggableItem :
     // This prevents the user from dragging it during an automatic movement
     private bool isMoving = false;
 
-
-    void Start()
+    private void SaveStartingPosition()
     {
-        startLocalPosition = transform.localPosition;
+        if (startingPositionSaved)
+        {
+            return;
+        }
 
+        startLocalPosition = transform.localPosition;
         startLocalRotation = transform.localRotation;
 
         lockedWorldZ = transform.position.z + frontOffset;
         lockedWorldRotation = transform.rotation;
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            originalIsKinematic = rb.isKinematic;
+        }
+
+        startingPositionSaved = true;
+    }
+
+    void Start()
+    {
+        SaveStartingPosition();
 
         Rigidbody rb = GetComponent<Rigidbody>();
 
@@ -418,6 +437,51 @@ public class PlacementDraggableItem :
         if (target != null && currentHoverTarget == target)
         {
             currentHoverTarget = null;
+        }
+    }
+
+    public void ResetForReplay()
+    {
+
+        SaveStartingPosition();
+        StopAllCoroutines();
+
+        isLocked = false;
+        isMoving = false;
+        wrongAttempts = 0;
+        currentHoverTarget = null;
+        initialGrabOffset = Vector3.zero;
+
+        transform.localPosition = startLocalPosition;
+        transform.localRotation = startLocalRotation;
+
+        lockedWorldZ = transform.position.z + frontOffset;
+        lockedWorldRotation = transform.rotation;
+
+        enabled = true;
+        gameObject.SetActive(true);
+
+        Collider[] colliders =
+            GetComponentsInChildren<Collider>(true);
+
+        foreach (Collider col in colliders)
+        {
+            if (col != null)
+            {
+                col.enabled = true;
+            }
+        }
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+
+            originalIsKinematic = true;
         }
     }
 }

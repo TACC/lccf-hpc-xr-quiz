@@ -25,6 +25,12 @@ public class VanDriveOff : MonoBehaviour
     private Transform[] wheelSpinPivots;
     private bool isDriving = false;
 
+    private Vector3 originalLocalPosition;
+    private Quaternion originalLocalRotation;
+    private Quaternion[] originalPivotLocalRotations;
+    private Vector3[] originalWheelLocalPositions;
+    private Quaternion[] originalWheelLocalRotations;
+
     void Start()
     {
         if (superCityManager == null)
@@ -37,15 +43,26 @@ public class VanDriveOff : MonoBehaviour
             wheelSpinAxis = Vector3.forward;
         }
 
+        originalLocalPosition = transform.localPosition;
+        originalLocalRotation = transform.localRotation;
+
         wheelSpinAxis.Normalize();
 
         wheelSpinPivots = new Transform[wheels.Length];
+
+        originalPivotLocalRotations = new Quaternion[wheels.Length];
+        originalWheelLocalPositions = new Vector3[wheels.Length];
+        originalWheelLocalRotations = new Quaternion[wheels.Length];
 
         for (int i = 0; i < wheels.Length; i++)
         {
             if (wheels[i] != null)
             {
                 wheelSpinPivots[i] = CreateSpinPivotForWheel(wheels[i]);
+
+                originalPivotLocalRotations[i] = wheelSpinPivots[i].localRotation;
+                originalWheelLocalPositions[i] = wheels[i].transform.localPosition;
+                originalWheelLocalRotations[i] = wheels[i].transform.localRotation;
 
                 wheels[i].SetActive(false);
             }
@@ -150,6 +167,62 @@ public class VanDriveOff : MonoBehaviour
                     Space.Self
                 );
             }
+        }
+    }
+
+    public void ResetVan()
+    {
+        StopAllCoroutines();
+
+        isDriving = false;
+
+        transform.localPosition = originalLocalPosition;
+        transform.localRotation = originalLocalRotation;
+
+        if (wheels == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < wheels.Length; i++)
+        {
+            if (wheels[i] == null)
+            {
+                continue;
+            }
+
+            if (wheelSpinPivots != null &&
+                i < wheelSpinPivots.Length &&
+                wheelSpinPivots[i] != null)
+            {
+                if (wheels[i].transform.parent != wheelSpinPivots[i])
+                {
+                    wheels[i].transform.SetParent(wheelSpinPivots[i], false);
+                }
+
+                if (originalPivotLocalRotations != null &&
+                    i < originalPivotLocalRotations.Length)
+                {
+                    wheelSpinPivots[i].localRotation =
+                        originalPivotLocalRotations[i];
+                }
+            }
+
+            if (originalWheelLocalPositions != null &&
+                i < originalWheelLocalPositions.Length)
+            {
+                wheels[i].transform.localPosition =
+                    originalWheelLocalPositions[i];
+            }
+
+            if (originalWheelLocalRotations != null &&
+                i < originalWheelLocalRotations.Length)
+            {
+                wheels[i].transform.localRotation =
+                    originalWheelLocalRotations[i];
+            }
+
+            wheels[i].SetActive(false);
         }
     }
 }

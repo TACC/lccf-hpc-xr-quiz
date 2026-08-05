@@ -216,8 +216,26 @@ public class BrokenCityPieces : MonoBehaviour
     public void ResetCity()
     {
         StopAllCoroutines();
+
         isRepairing = false;
         isBroken = true;
+
+        if (pieces == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < pieces.Length; i++)
+        {
+            if (pieces[i] == null)
+            {
+                continue;
+            }
+
+            pieces[i].position = crackedWorldPositions[i];
+            pieces[i].rotation = originalWorldRotations[i];
+            pieces[i].gameObject.SetActive(true);
+        }
     }
 
 

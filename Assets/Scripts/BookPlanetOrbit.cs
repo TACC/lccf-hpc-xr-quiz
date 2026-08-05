@@ -122,4 +122,16 @@ public class BookPlanetOrbit : MonoBehaviour
         transform.localPosition = originalLocalPosition;
         transform.localRotation = originalLocalRotation;
     }
+
+    public void ResetOrbit()
+    {
+        StopAllCoroutines();
+
+        isOrbiting = false;
+        currentAngle = startingAngle;
+
+        transform.localPosition = originalLocalPosition;
+        transform.localRotation = originalLocalRotation;
+    }
+
 }

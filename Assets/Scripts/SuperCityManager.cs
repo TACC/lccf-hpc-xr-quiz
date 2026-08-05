@@ -24,6 +24,7 @@ public class SuperCityManager : MonoBehaviour
     [Header("Intro Burst")]
     public IntroOrbBurst introOrbBurst;
 
+    public IntroScreenController introScreenController;
 
     [Header("City Layer")]
 
@@ -45,23 +46,7 @@ public class SuperCityManager : MonoBehaviour
 
     public GameObject[] finalAnalogyObjects;
 
-    public Transform finalOrbitCenter;
-
     public TMP_Text finalScoreText;
-
-    public AudioClip finalAudioClip;
-
-    public float finalObjectAppearDelay = 0.5f;
-
-    public float finalOrbitRadius = 2.5f;
-
-    public float finalOrbitHeight = 0.5f;
-
-    public float finalOrbitSpeed = 45f;
-
-    public float finalGlowIntensity = 1.5f;
-
-    public Color finalGlowColor = Color.green;
 
     // Connects to BrokenCityPieces script
     public BrokenCityPieces brokenCityPieces;
@@ -101,17 +86,6 @@ public class SuperCityManager : MonoBehaviour
 
     // Stores the placement scene for each phase
     public GameObject[] placementGroups;
-
-    [Tooltip("This phase only shows the motherboard and then automatically moves on.")]
-
-    // Motherboard phase does not wait for user input
-    public int motherboardOnlyPlacementPhaseIndex = 0;
-
-
-    [Header("Motherboard-Only Timer")]
-
-    public float motherboardOnlyDuration = 3f;
-
 
     [Header("Audio")]
 
@@ -156,15 +130,14 @@ public class SuperCityManager : MonoBehaviour
     private bool analogyAudioFinished = false;
     private bool analogySolvedWhileAudioPlaying = false;
 
-    private bool finalOrbitRunning = false;
-    private float finalOrbitAngle = 0f;
-
     // Used so scene cannot move on until placement audio is finished
     private bool placementAudioFinished = false;
     private bool hardwarePlacementCompleted = false;
 
     private Vector3[] originalCityAnalogyPositions;
     private Vector3[] originalPlacementGroupPositions;
+
+    private bool quizInitialized = false;
 
     private class TransformHomeState
     {
@@ -179,14 +152,9 @@ public class SuperCityManager : MonoBehaviour
     private readonly List<TransformHomeState> sceneTransformHomeStates =
         new List<TransformHomeState>();
 
-    private Vector3[] finalOriginalOffsets;
-    private Vector3[] finalOriginalPositions;
-
     private bool analogyCorrectVisualsStarted = false;
     private bool analogyScoreCountedThisPhase = false;
     private bool brokenCityRepairStarted = false;
-
-    private Quaternion[] finalOriginalRotations;
 
     private bool analogyVisualsFinished = false;
     private bool analogySolved = false;
@@ -237,7 +205,7 @@ public class SuperCityManager : MonoBehaviour
         // Hide everything at the very beginning
         HideAll();
 
-        StoreFinalOriginalPositions();
+        quizInitialized = true;
     }
 
     public void BeginQuiz()
@@ -245,33 +213,20 @@ public class SuperCityManager : MonoBehaviour
         ResetEntireQuiz();
         HideAll();
 
-        introIsPlaying = true;
+        currentPhase = 0;
+        phaseTransitionRunning = false;
 
-        StartCoroutine(PlayIntroThenStartSceneOne());
-    }
+        currentAnalogyHadWrongGuess = false;
+        analogyScoreCountedThisPhase = false;
+        analogyCorrectVisualsStarted = false;
+        brokenCityRepairStarted = false;
+        analogyVisualsFinished = false;
+        analogySolved = false;
+        analogyAudioFinished = false;
 
-    private void StoreFinalOriginalPositions()
-    {
-        if (finalAnalogyObjects == null || finalOrbitCenter == null)
-        {
-            return;
-        }
-
-        finalOriginalPositions = new Vector3[finalAnalogyObjects.Length];
-        finalOriginalOffsets = new Vector3[finalAnalogyObjects.Length];
-        finalOriginalRotations = new Quaternion[finalAnalogyObjects.Length];
-
-        for (int i = 0; i < finalAnalogyObjects.Length; i++)
-        {
-            if (finalAnalogyObjects[i] == null)
-            {
-                continue;
-            }
-
-            finalOriginalPositions[i] = finalAnalogyObjects[i].transform.position;
-            finalOriginalOffsets[i] = finalAnalogyObjects[i].transform.position - finalOrbitCenter.position;
-            finalOriginalRotations[i] = finalAnalogyObjects[i].transform.rotation;
-        }
+        StartAnalogyPhase(0);
+        ResetCurrentAnalogyChoices();
+        StartCoroutine(PlayAnalogyAudioForCurrentPhase());
     }
 
     // Hides every major layer and phase object
@@ -632,13 +587,6 @@ public class SuperCityManager : MonoBehaviour
     }
 
 
-    // Checks if the current placement phase should be motherboard-only
-    private bool IsMotherboardOnlyPlacementPhase()
-    {
-        return currentPhase == motherboardOnlyPlacementPhaseIndex;
-    }
-
-
     // Called when the user selects the correct answer in the city analogy layer
     public void OnAnalogySolved()
     {
@@ -721,7 +669,6 @@ public class SuperCityManager : MonoBehaviour
         // Broken city animation
         if (IsBrokenCityPhase())
         {
-            HideCurrentPhaseAnswerChoices();
 
             if (brokenCityPieces != null)
             {
@@ -852,15 +799,9 @@ public class SuperCityManager : MonoBehaviour
     {
         GameObject objectToSlide = null;
 
-        if (repairedCityModel != null && repairedCityModel.activeSelf)
-        {
-            objectToSlide = repairedCityModel;
-        }
-
-        // Slide the current city analogy
-        else if (cityAnalogies != null &&
-                 currentPhase >= 0 &&
-                 currentPhase < cityAnalogies.Length)
+        if (cityAnalogies != null &&
+            currentPhase >= 0 &&
+            currentPhase < cityAnalogies.Length)
         {
             objectToSlide = cityAnalogies[currentPhase];
         }
@@ -872,7 +813,8 @@ public class SuperCityManager : MonoBehaviour
 
         Vector3 startPosition = objectToSlide.transform.position;
 
-        Vector3 endPosition = startPosition + new Vector3(0f, analogySlideUpDistance, 0f);
+        Vector3 endPosition =
+            startPosition + new Vector3(0f, analogySlideUpDistance, 0f);
 
         yield return StartCoroutine(SlideObject(
             objectToSlide,
@@ -881,14 +823,7 @@ public class SuperCityManager : MonoBehaviour
             analogySlideUpDuration
         ));
 
-        // After sliding, hide the current city analogy
-        if (cityAnalogies != null &&
-            currentPhase >= 0 &&
-            currentPhase < cityAnalogies.Length &&
-            cityAnalogies[currentPhase] != null)
-        {
-            cityAnalogies[currentPhase].SetActive(false);
-        }
+        objectToSlide.SetActive(false);
 
         if (repairedCityModel != null)
         {
@@ -945,7 +880,6 @@ public class SuperCityManager : MonoBehaviour
 
         currentPlacementGroup.transform.position = startPosition;
         currentPlacementGroup.SetActive(true);
-
         RestartAnimatorsUnder(currentPlacementGroup);
 
         yield return StartCoroutine(SlideObject(
@@ -954,6 +888,9 @@ public class SuperCityManager : MonoBehaviour
             finalPosition,
             placementSlideUpDuration
         ));
+
+        ShowAllPlacementTargetGlows(currentPlacementGroup);
+
 
         Debug.Log("Showing placement group for phase " + currentPhase);
 
@@ -968,18 +905,8 @@ public class SuperCityManager : MonoBehaviour
         // Start placement audio
         StartCoroutine(PlayPlacementAudioForCurrentPhase());
 
-        if (IsMotherboardOnlyPlacementPhase())
-        {
-            Debug.Log("Motherboard-only placement phase. Moving on after " + motherboardOnlyDuration + " seconds.");
+        Debug.Log("Waiting for user to correctly place the hardware.");
 
-            yield return new WaitForSeconds(motherboardOnlyDuration);
-
-            OnHardwarePlaced();
-        }
-        else
-        {
-            Debug.Log("Waiting for user to correctly place the hardware.");
-        }
     }
 
 
@@ -1074,7 +1001,7 @@ public class SuperCityManager : MonoBehaviour
 
         if (currentPhase == finalPlacementPhaseIndex)
         {
-            yield return StartCoroutine(FinalCelebrationRoutine());
+            yield return StartCoroutine(ShowFinalSceneRoutine());
             yield break;
         }
 
@@ -1288,139 +1215,8 @@ public class SuperCityManager : MonoBehaviour
         );
     }
 
-    private void SetObjectGreenGlow(GameObject obj)
-    {
-        Renderer[] objectRenderers = obj.GetComponentsInChildren<Renderer>(true);
-
-        foreach (Renderer renderer in objectRenderers)
-        {
-            if (renderer == null)
-            {
-                continue;
-            }
-
-            Material material = renderer.material;
-
-            if (material.HasProperty("_EmissionColor"))
-            {
-                material.EnableKeyword("_EMISSION");
-                material.SetColor("_EmissionColor", finalGlowColor * finalGlowIntensity);
-            }
-
-            if (material.HasProperty("_Color"))
-            {
-                Color currentColor = material.color;
-                material.color = Color.Lerp(currentColor, finalGlowColor, 0.25f);
-            }
-        }
-    }
-
-    void Update()
-    {
-        if (!finalOrbitRunning)
-        {
-            return;
-        }
-
-        if (finalAnalogyObjects == null || finalOrbitCenter == null || finalOriginalOffsets == null)
-        {
-            return;
-        }
-
-        finalOrbitAngle += finalOrbitSpeed * Time.deltaTime;
-
-        for (int i = 0; i < finalAnalogyObjects.Length; i++)
-        {
-            if (finalAnalogyObjects[i] == null || !finalAnalogyObjects[i].activeSelf)
-            {
-                continue;
-            }
-
-            // Rotate each object's original offset around the motherboard
-            Quaternion rotation = Quaternion.Euler(0f, finalOrbitAngle, 0f);
-
-            Vector3 rotatedOffset = rotation * finalOriginalOffsets[i];
-
-            finalAnalogyObjects[i].transform.position = finalOrbitCenter.position + rotatedOffset;
-
-            if (finalOriginalRotations != null && i < finalOriginalRotations.Length)
-            {
-                finalAnalogyObjects[i].transform.rotation = finalOriginalRotations[i];
-            }
-        }
-    }
-
-    private IEnumerator FinalCelebrationRoutine()
-    {
-        Debug.Log("Final placement complete. Starting final celebration.");
-
-        finalOrbitRunning = false;
-        finalOrbitAngle = 0f;
-
-        HideFinalCelebrationObjects();
-
-        if (explanationAudioSource != null && finalAudioClip != null)
-        {
-            explanationAudioSource.Stop();
-            explanationAudioSource.clip = finalAudioClip;
-            explanationAudioSource.Play();
-        }
-
-        if (finalAnalogyObjects != null)
-        {
-            for (int i = 0; i < finalAnalogyObjects.Length; i++)
-            {
-                GameObject obj = finalAnalogyObjects[i];
-
-                if (obj == null)
-                {
-                    continue;
-                }
-
-                // Restore original position
-                if (finalOriginalPositions != null && i < finalOriginalPositions.Length)
-                {
-                    obj.transform.position = finalOriginalPositions[i];
-                }
-
-                // Restore original rotation
-                if (finalOriginalRotations != null && i < finalOriginalRotations.Length)
-                {
-                    obj.transform.rotation = finalOriginalRotations[i];
-                }
-
-                obj.SetActive(true);
-
-                SetObjectGreenGlow(obj);
-
-                yield return new WaitForSeconds(finalObjectAppearDelay);
-            }
-        }
-
-        if (finalScoreText != null)
-        {
-            finalScoreText.text = "Analogy Score: " + analogyCorrectFirstTryScore + " / " + cityAnalogies.Length;
-            finalScoreText.gameObject.SetActive(true);
-        }
-
-        finalOrbitRunning = true;
-
-        Debug.Log("Final score displayed: " + analogyCorrectFirstTryScore);
-    }
-
     private void HideFinalCelebrationObjects()
     {
-        if (finalAnalogyObjects != null)
-        {
-            foreach (GameObject obj in finalAnalogyObjects)
-            {
-                if (obj != null)
-                {
-                    obj.SetActive(false);
-                }
-            }
-        }
-
         if (finalScoreText != null)
         {
             finalScoreText.gameObject.SetActive(false);
@@ -1429,18 +1225,18 @@ public class SuperCityManager : MonoBehaviour
 
     public void ReplayCurrentScene()
     {
+        if (introScreenController != null &&
+            introScreenController.IsZCanvasScreenShowing())
+        {
+            return;
+        }
+
         StopAllCoroutines();
 
         if (explanationAudioSource != null)
         {
             explanationAudioSource.Stop();
             explanationAudioSource.clip = null;
-        }
-
-        if (introIsPlaying || (introLayer != null && introLayer.activeSelf))
-        {
-            ReplayIntro();
-            return;
         }
 
         phaseTransitionRunning = false;
@@ -1506,6 +1302,8 @@ public class SuperCityManager : MonoBehaviour
     {
         HideAllCityAnalogies();
         HideAllPlacementGroups();
+        ResetAllCustomAnimations();
+        RestoreAllAnswerChoices();
 
         if (placementLayer != null)
         {
@@ -1528,11 +1326,6 @@ public class SuperCityManager : MonoBehaviour
 
         StartAnalogyPhase(currentPhase);
 
-        if (currentPhase == brokenCityPhaseIndex && brokenCityPieces != null)
-        {
-            brokenCityPieces.ResetCity();
-        }
-
         ResetCurrentAnalogyChoices();
 
         StartCoroutine(PlayAnalogyAudioForCurrentPhase());
@@ -1543,6 +1336,7 @@ public class SuperCityManager : MonoBehaviour
     private void ReplayCurrentPlacement()
     {
         HideAllCityAnalogies();
+        ResetAllCustomAnimations();
         ResetCurrentPlacementForReplay();
         HideAllPlacementGroups();
 
@@ -1602,9 +1396,6 @@ public class SuperCityManager : MonoBehaviour
         placementAudioFinished = false;
         hardwarePlacementCompleted = false;
 
-        finalOrbitRunning = false;
-        finalOrbitAngle = 0f;
-
         if (introOrbBurst != null)
         {
             introOrbBurst.ResetIntro();
@@ -1612,13 +1403,11 @@ public class SuperCityManager : MonoBehaviour
 
         // Restore every animated/moved object before anything is shown again
         RestoreSceneTransformsAndAnimators();
-
-        if (brokenCityPieces != null)
-        {
-            brokenCityPieces.ResetCity();
-        }
+        ResetAllCustomAnimations();
 
         RestoreAllAnswerChoices();
+        ResetAllPlacementDraggables();
+        ResetAllPlacementTargets();
 
         for (int i = 0; i < cityAnalogies.Length; i++)
         {
@@ -1839,6 +1628,9 @@ public class SuperCityManager : MonoBehaviour
         }
 
         ResetAnimatorsUnder(placementGroups[currentPhase]);
+        ResetPlacementDraggables(placementGroups[currentPhase]);
+        ResetPlacementTargets(placementGroups[currentPhase]);
+        ShowAllPlacementTargetGlows(placementGroups[currentPhase]);
     }
 
     private void StoreAnswerHomeStates()
@@ -1934,4 +1726,278 @@ public class SuperCityManager : MonoBehaviour
         }
     }
 
+    private IEnumerator ShowFinalSceneRoutine()
+    {
+        GameObject currentPlacementGroup = null;
+
+        if (placementGroups != null &&
+            currentPhase >= 0 &&
+            currentPhase < placementGroups.Length)
+        {
+            currentPlacementGroup = placementGroups[currentPhase];
+        }
+
+        if (currentPlacementGroup != null && currentPlacementGroup.activeSelf)
+        {
+            Vector3 startPosition = currentPlacementGroup.transform.position;
+            Vector3 endPosition =
+                startPosition + new Vector3(0f, placementSlideUpDistance, 0f);
+
+            yield return StartCoroutine(SlideObject(
+                currentPlacementGroup,
+                startPosition,
+                endPosition,
+                placementSlideUpDuration
+            ));
+
+            currentPlacementGroup.SetActive(false);
+        }
+
+        HideAllCityAnalogies();
+        HideAllPlacementGroups();
+
+        if (cityLayer != null)
+        {
+            cityLayer.SetActive(false);
+        }
+
+        if (placementLayer != null)
+        {
+            placementLayer.SetActive(false);
+        }
+
+        if (explanationAudioSource != null)
+        {
+            explanationAudioSource.Stop();
+            explanationAudioSource.clip = null;
+        }
+
+        phaseTransitionRunning = false;
+
+        if (finalAnalogyObjects != null)
+        {
+            foreach (GameObject obj in finalAnalogyObjects)
+            {
+                if (obj != null)
+                {
+                    obj.SetActive(true);
+                }
+            }
+        }
+
+        if (finalScoreText != null)
+        {
+            finalScoreText.text =
+                analogyCorrectFirstTryScore +
+                " / " +
+                cityAnalogies.Length + " COMPONENTS";
+
+            finalScoreText.gameObject.SetActive(true);
+        }
+
+        if (introScreenController != null)
+        {
+            introScreenController.ShowFinalScene();
+        }
+        else
+        {
+            Debug.LogError("IntroScreenController is not assigned on SuperCityManager.");
+        }
+    }
+
+    private void ResetAllCustomAnimations()
+    {
+        if (!quizInitialized)
+        {
+            return;
+        }
+
+        if (bookOrbitGroups != null)
+        {
+            foreach (BookOrbitGroup group in bookOrbitGroups)
+            {
+                if (group != null)
+                {
+                    group.ResetAllBooks();
+                }
+            }
+        }
+
+        if (cityLayer != null)
+        {
+            BuildingDarkFilter[] filters =
+                cityLayer.GetComponentsInChildren<BuildingDarkFilter>(true);
+
+            foreach (BuildingDarkFilter filter in filters)
+            {
+                if (filter != null)
+                {
+                    filter.ResetFilter();
+                }
+            }
+
+            ElevatorDoorBrokenAnimation[] elevators =
+                cityLayer.GetComponentsInChildren<ElevatorDoorBrokenAnimation>(true);
+
+            foreach (ElevatorDoorBrokenAnimation elevator in elevators)
+            {
+                if (elevator != null)
+                {
+                    elevator.ResetElevatorDoors();
+                }
+            }
+
+            VanDriveOff[] vans =
+                cityLayer.GetComponentsInChildren<VanDriveOff>(true);
+
+            foreach (VanDriveOff van in vans)
+            {
+                if (van != null)
+                {
+                    van.ResetVan();
+                }
+            }
+        }
+
+        if (placementLayer != null)
+        {
+            BuildingDarkFilter[] filters =
+                placementLayer.GetComponentsInChildren<BuildingDarkFilter>(true);
+
+            foreach (BuildingDarkFilter filter in filters)
+            {
+                if (filter != null)
+                {
+                    filter.ResetFilter();
+                }
+            }
+
+            ElevatorDoorBrokenAnimation[] elevators =
+                placementLayer.GetComponentsInChildren<ElevatorDoorBrokenAnimation>(true);
+
+            foreach (ElevatorDoorBrokenAnimation elevator in elevators)
+            {
+                if (elevator != null)
+                {
+                    elevator.ResetElevatorDoors();
+                }
+            }
+
+            VanDriveOff[] vans =
+                placementLayer.GetComponentsInChildren<VanDriveOff>(true);
+
+            foreach (VanDriveOff van in vans)
+            {
+                if (van != null)
+                {
+                    van.ResetVan();
+                }
+            }
+        }
+
+        if (brokenCityPieces != null)
+        {
+            brokenCityPieces.ResetCity();
+        }
+    }
+    
+    private void ResetPlacementDraggables(GameObject placementGroup)
+    {
+        if (placementGroup == null)
+        {
+            return;
+        }
+
+        PlacementDraggableItem[] draggableItems =
+            placementGroup.GetComponentsInChildren<PlacementDraggableItem>(true);
+
+        foreach (PlacementDraggableItem item in draggableItems)
+        {
+            if (item != null)
+            {
+                item.ResetForReplay();
+            }
+        }
+    }
+
+    private void ResetAllPlacementDraggables()
+    {
+        if (placementGroups == null)
+        {
+            return;
+        }
+
+        foreach (GameObject placementGroup in placementGroups)
+        {
+            if (placementGroup == null)
+            {
+                continue;
+            }
+
+            PlacementDraggableItem[] draggableItems =
+                placementGroup.GetComponentsInChildren<PlacementDraggableItem>(true);
+
+            foreach (PlacementDraggableItem item in draggableItems)
+            {
+                if (item != null)
+                {
+                    item.ResetForReplay();
+                }
+            }
+        }
+    }
+
+    private void ShowAllPlacementTargetGlows(GameObject placementGroup)
+    {
+        if (placementGroup == null)
+        {
+            return;
+        }
+
+        PlacementDropTarget[] targets =
+            placementGroup.GetComponentsInChildren<PlacementDropTarget>(true);
+
+        foreach (PlacementDropTarget target in targets)
+        {
+            if (target != null)
+            {
+                target.ShowGlow();
+            }
+        }
+    }
+
+    private void ResetPlacementTargets(GameObject placementGroup)
+    {
+        if (placementGroup == null)
+        {
+            return;
+        }
+
+        PlacementDropTarget[] targets =
+            placementGroup.GetComponentsInChildren<PlacementDropTarget>(true);
+
+        foreach (PlacementDropTarget target in targets)
+        {
+            if (target != null)
+            {
+                target.ResetTarget();
+            }
+        }
+    }
+
+    private void ResetAllPlacementTargets()
+    {
+        if (placementGroups == null)
+        {
+            return;
+        }
+
+        foreach (GameObject placementGroup in placementGroups)
+        {
+            if (placementGroup != null)
+            {
+                ResetPlacementTargets(placementGroup);
+            }
+        }
+    }
 }

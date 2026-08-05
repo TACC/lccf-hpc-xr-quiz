@@ -205,4 +205,36 @@ public class ElevatorDoorBrokenAnimation : MonoBehaviour
         if (L_2 != null) L_2.gameObject.SetActive(false);
         if (R_2 != null) R_2.gameObject.SetActive(false);
     }
+
+    public void ResetElevatorDoors()
+    {
+        StopAllCoroutines();
+
+        isBroken = true;
+        isFixing = false;
+
+        if (L != null)
+        {
+            L.gameObject.SetActive(true);
+            L.localPosition = L_Start;
+        }
+
+        if (R != null)
+        {
+            R.gameObject.SetActive(true);
+            R.localPosition = R_Start;
+        }
+
+        if (L_2 != null)
+        {
+            L_2.gameObject.SetActive(true);
+            L_2.localPosition = L2_Start;
+        }
+
+        if (R_2 != null)
+        {
+            R_2.gameObject.SetActive(true);
+            R_2.localPosition = R2_Start;
+        }
+    }
 }
