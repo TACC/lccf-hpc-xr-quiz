@@ -42,6 +42,8 @@ public class SuperCityManager : MonoBehaviour
 
     [Header("Final Celebration")]
 
+    public CreditsManager creditsManager;
+
     public int finalPlacementPhaseIndex = 5;
 
     public GameObject[] finalAnalogyObjects;
@@ -1802,6 +1804,11 @@ public class SuperCityManager : MonoBehaviour
         else
         {
             Debug.LogError("IntroScreenController is not assigned on SuperCityManager.");
+        }
+
+        if (creditsManager != null)
+        {
+            creditsManager.ShowCreditsAfterDelay();
         }
     }
 
