@@ -26,6 +26,9 @@ public class PlacementDropTarget : MonoBehaviour
     [Header("Installed Object")]
     public GameObject installedObject;
 
+    [Header("Mini Motherboard")]
+    public GameObject miniMotherboard;
+
     void Start()
     {
         if (snapPoint == null)
@@ -113,6 +116,11 @@ public class PlacementDropTarget : MonoBehaviour
 
         HideGlow();
 
+        if (miniMotherboard != null)
+        {
+            miniMotherboard.SetActive(false);
+        }
+
         Debug.Log("Correct placement: " + expectedItemID);
 
         if (installedObject != null)
@@ -140,6 +148,10 @@ public class PlacementDropTarget : MonoBehaviour
         if (installedObject != null)
         {
             installedObject.SetActive(false);
+        }
+        if (miniMotherboard != null)
+        {
+            miniMotherboard.SetActive(true);
         }
     }
 }
