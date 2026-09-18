@@ -123,6 +123,20 @@ public class SuperCityManager : MonoBehaviour
 
     public float placementSlideUpDuration = 1.2f;
 
+    // variables for z depth transition
+    [Header("Analogy Depth Transition")]
+
+    public float analogyZTransitionDistance = 5f;
+
+    public float analogySlideDuration = 1.2f;
+
+
+    [Header("Placement Depth Transition")]
+
+    public float placementZTransitionDistance = 5f;
+
+    public float placementSlideDuration = 1.2f;
+
 
     private bool phaseTransitionRunning = false;
 
@@ -816,13 +830,13 @@ public class SuperCityManager : MonoBehaviour
         Vector3 startPosition = objectToSlide.transform.position;
 
         Vector3 endPosition =
-            startPosition + new Vector3(0f, analogySlideUpDistance, 0f);
+            startPosition + new Vector3(0f, 0f, -analogyZTransitionDistance);
 
         yield return StartCoroutine(SlideObject(
             objectToSlide,
             startPosition,
             endPosition,
-            analogySlideUpDuration
+            analogySlideDuration
         ));
 
         objectToSlide.SetActive(false);
@@ -878,7 +892,7 @@ public class SuperCityManager : MonoBehaviour
         }
 
         Vector3 finalPosition = originalPlacementGroupPositions[currentPhase];
-        Vector3 startPosition = finalPosition + new Vector3(0f, -placementSlideUpDistance, 0f);
+        Vector3 startPosition = finalPosition + new Vector3(0f, 0f, placementZTransitionDistance);
 
         currentPlacementGroup.transform.position = startPosition;
         currentPlacementGroup.SetActive(true);
@@ -888,7 +902,7 @@ public class SuperCityManager : MonoBehaviour
             currentPlacementGroup,
             startPosition,
             finalPosition,
-            placementSlideUpDuration
+            placementSlideDuration
         ));
 
         ShowAllPlacementTargetGlows(currentPlacementGroup);
@@ -1020,13 +1034,13 @@ public class SuperCityManager : MonoBehaviour
         if (currentPlacementGroup != null && currentPlacementGroup.activeSelf)
         {
             Vector3 startPosition = currentPlacementGroup.transform.position;
-            Vector3 endPosition = startPosition + new Vector3(0f, placementSlideUpDistance, 0f);
+            Vector3 endPosition = startPosition + new Vector3(0f, 0f, -placementZTransitionDistance);
 
             yield return StartCoroutine(SlideObject(
                 currentPlacementGroup,
                 startPosition,
                 endPosition,
-                placementSlideUpDuration
+                placementSlideDuration
             ));
 
             currentPlacementGroup.SetActive(false);
@@ -1100,7 +1114,7 @@ public class SuperCityManager : MonoBehaviour
         }
 
         Vector3 finalPosition = originalCityAnalogyPositions[currentPhase];
-        Vector3 startPosition = finalPosition + new Vector3(0f, -analogySlideUpDistance, 0f);
+        Vector3 startPosition = finalPosition + new Vector3(0f, 0f, analogyZTransitionDistance);
 
         // Put the whole analogy below the screen first
         currentAnalogy.transform.position = startPosition;
@@ -1129,7 +1143,7 @@ public class SuperCityManager : MonoBehaviour
             currentAnalogy,
             startPosition,
             finalPosition,
-            analogySlideUpDuration
+            analogySlideDuration
         ));
 
         currentAnalogyHadWrongGuess = false;
@@ -1743,13 +1757,13 @@ public class SuperCityManager : MonoBehaviour
         {
             Vector3 startPosition = currentPlacementGroup.transform.position;
             Vector3 endPosition =
-                startPosition + new Vector3(0f, placementSlideUpDistance, 0f);
+                startPosition + new Vector3(0f, 0f, -placementZTransitionDistance);
 
             yield return StartCoroutine(SlideObject(
                 currentPlacementGroup,
                 startPosition,
                 endPosition,
-                placementSlideUpDuration
+                placementSlideDuration
             ));
 
             currentPlacementGroup.SetActive(false);

@@ -1,0 +1,34 @@
+{
+    "name": "zSpace.zView.Editor",
+    "rootNamespace": "",
+    "references": [
+        "zSpace.zView.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "0.0.0",
+            "define": "ZSPACE_UNITY_RENDER_PIPELINE_UNIVERSAL"
+        },
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "10.0.0",
+            "define": "ZSPACE_UNITY_RENDER_PIPELINE_UNIVERSAL_10_0_0_OR_NEWER"
+        },
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "12.0.0",
+            "define": "ZSPACE_UNITY_RENDER_PIPELINE_UNIVERSAL_12_0_0_OR_NEWER"
+        }
+    ],
+    "noEngineReferences": false
+}

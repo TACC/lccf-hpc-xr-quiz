@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731704, g: 0.13414727, b: 0.121078536, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731707, g: 0.13414727, b: 0.12107857, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -9155,6 +9155,10 @@ MonoBehaviour:
   analogySlideUpDuration: 1
   placementSlideUpDistance: 8
   placementSlideUpDuration: 1
+  analogyZTransitionDistance: 20
+  analogySlideDuration: 2
+  placementZTransitionDistance: 20
+  placementSlideDuration: 2
 --- !u!82 &109934319
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12164,7 +12168,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &192214105
 RectTransform:
   m_ObjectHideFlags: 0
