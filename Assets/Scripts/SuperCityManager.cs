@@ -106,6 +106,8 @@ public class SuperCityManager : MonoBehaviour
 
     public float pauseAfterAudio = 0.5f;
 
+    [SerializeField] private UserStudyDataManager userStudyDataManager;
+
 
     [Header("Analogy Slide Transition")]
 
@@ -226,6 +228,19 @@ public class SuperCityManager : MonoBehaviour
 
     public void BeginQuiz()
     {
+        if (userStudyDataManager == null)
+        {
+            Debug.LogError("UserStudyDataManager is not assigned.");
+            return;
+        }
+
+        int numberOfPhases = cityAnalogies != null ? cityAnalogies.Length : 0;
+        if (!userStudyDataManager.BeginSession(numberOfPhases))
+        {
+            Debug.LogError("Could not begin user study session.");
+            return;
+        }
+
         ResetEntireQuiz();
         HideAll();
 
@@ -556,6 +571,11 @@ public class SuperCityManager : MonoBehaviour
             }
         }
 
+        if (userStudyDataManager != null)
+        {
+            userStudyDataManager.BeginAnalogyPhase(currentPhase);
+        }
+
         Debug.Log("Starting analogy phase " + currentPhase);
     }
 
@@ -609,6 +629,11 @@ public class SuperCityManager : MonoBehaviour
         if (phaseTransitionRunning)
         {
             return;
+        }
+
+        if (userStudyDataManager != null)
+        {
+            userStudyDataManager.CompleteAnalogyPhase(currentPhase);
         }
 
         if (!analogyScoreCountedThisPhase)
@@ -721,6 +746,11 @@ public class SuperCityManager : MonoBehaviour
 
     public void OnAnalogyWrongGuess()
     {
+        if (userStudyDataManager != null)
+        {
+            userStudyDataManager.RegisterAnalogyMistake(currentPhase);
+        }
+
         currentAnalogyHadWrongGuess = true;
         Debug.Log("Wrong analogy guess. This phase no longer counts as first try.");
     }
@@ -907,6 +937,10 @@ public class SuperCityManager : MonoBehaviour
 
         ShowAllPlacementTargetGlows(currentPlacementGroup);
 
+        if (userStudyDataManager != null)
+        {
+            userStudyDataManager.BeginPlacementPhase(currentPhase);
+        }
 
         Debug.Log("Showing placement group for phase " + currentPhase);
 
@@ -991,6 +1025,11 @@ public class SuperCityManager : MonoBehaviour
         if (phaseTransitionRunning)
         {
             return;
+        }
+
+        if (userStudyDataManager != null)
+        {
+            userStudyDataManager.CompletePlacementPhase(currentPhase);
         }
 
         hardwarePlacementCompleted = true;
@@ -1156,6 +1195,11 @@ public class SuperCityManager : MonoBehaviour
 
         phaseTransitionRunning = false;
 
+        if (userStudyDataManager != null)
+        {
+            userStudyDataManager.BeginAnalogyPhase(currentPhase);
+        }
+
         ResetCurrentAnalogyChoices();
 
         StartCoroutine(PlayAnalogyAudioForCurrentPhase());
@@ -1247,6 +1291,13 @@ public class SuperCityManager : MonoBehaviour
             return;
         }
 
+        bool placementIsShowing = placementLayer != null && placementLayer.activeSelf;
+
+        if (!placementIsShowing && userStudyDataManager != null)
+        {
+            userStudyDataManager.RegisterAnalogyRepeat(currentPhase);
+        }
+
         StopAllCoroutines();
 
         if (explanationAudioSource != null)
@@ -1256,10 +1307,6 @@ public class SuperCityManager : MonoBehaviour
         }
 
         phaseTransitionRunning = false;
-
-        bool placementIsShowing =
-            placementLayer != null &&
-            placementLayer.activeSelf;
 
         if (placementIsShowing)
         {
@@ -1377,6 +1424,15 @@ public class SuperCityManager : MonoBehaviour
 
     public void ReturnToHome()
     {
+        if (userStudyDataManager != null)
+        {
+            bool saved = userStudyDataManager.SaveSessionForHome();
+            if (!saved)
+            {
+                Debug.LogError("User study session could not be saved.");
+            }
+        }
+
         ResetEntireQuiz();
         HideAll();
 
@@ -1809,6 +1865,15 @@ public class SuperCityManager : MonoBehaviour
                 cityAnalogies.Length + " COMPONENTS";
 
             finalScoreText.gameObject.SetActive(true);
+        }
+
+        if (userStudyDataManager != null)
+        {
+            bool saved = userStudyDataManager.CompleteSession();
+            if (!saved)
+            {
+                Debug.LogError("Completed user study session could not be saved.");
+            }
         }
 
         if (introScreenController != null)
