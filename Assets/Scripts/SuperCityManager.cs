@@ -106,7 +106,7 @@ public class SuperCityManager : MonoBehaviour
 
     public float pauseAfterAudio = 0.5f;
 
-    [SerializeField] private UserStudyDataManager userStudyDataManager;
+    [SerializeField] private UserStudyService userStudy;
 
 
     [Header("Analogy Slide Transition")]
@@ -228,17 +228,19 @@ public class SuperCityManager : MonoBehaviour
 
     public void BeginQuiz()
     {
-        if (userStudyDataManager == null)
+        if (userStudy == null)
         {
-            Debug.LogError("UserStudyDataManager is not assigned.");
-            return;
+            Debug.LogError("UserStudyService is not assigned on SuperCityManager. " +
+                "This run will not be recorded.");
         }
-
-        int numberOfPhases = cityAnalogies != null ? cityAnalogies.Length : 0;
-        if (!userStudyDataManager.BeginSession(numberOfPhases))
+        else
         {
-            Debug.LogError("Could not begin user study session.");
-            return;
+            int numberOfPhases = cityAnalogies != null ? cityAnalogies.Length : 0;
+
+            if (!userStudy.BeginSession(numberOfPhases))
+            {
+                Debug.LogError("Could not begin the user study session. This run will not be recorded.");
+            }
         }
 
         ResetEntireQuiz();
@@ -571,9 +573,9 @@ public class SuperCityManager : MonoBehaviour
             }
         }
 
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            userStudyDataManager.BeginAnalogyPhase(currentPhase);
+            userStudy.BeginAnalogyPhase(currentPhase);
         }
 
         Debug.Log("Starting analogy phase " + currentPhase);
@@ -631,9 +633,9 @@ public class SuperCityManager : MonoBehaviour
             return;
         }
 
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            userStudyDataManager.CompleteAnalogyPhase(currentPhase);
+            userStudy.CompleteAnalogyPhase(currentPhase);
         }
 
         if (!analogyScoreCountedThisPhase)
@@ -746,9 +748,9 @@ public class SuperCityManager : MonoBehaviour
 
     public void OnAnalogyWrongGuess()
     {
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            userStudyDataManager.RegisterAnalogyMistake(currentPhase);
+            userStudy.RegisterAnalogyMistake(currentPhase);
         }
 
         currentAnalogyHadWrongGuess = true;
@@ -937,9 +939,9 @@ public class SuperCityManager : MonoBehaviour
 
         ShowAllPlacementTargetGlows(currentPlacementGroup);
 
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            userStudyDataManager.BeginPlacementPhase(currentPhase);
+            userStudy.BeginPlacementPhase(currentPhase);
         }
 
         Debug.Log("Showing placement group for phase " + currentPhase);
@@ -1027,9 +1029,9 @@ public class SuperCityManager : MonoBehaviour
             return;
         }
 
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            userStudyDataManager.CompletePlacementPhase(currentPhase);
+            userStudy.CompletePlacementPhase(currentPhase);
         }
 
         hardwarePlacementCompleted = true;
@@ -1195,9 +1197,9 @@ public class SuperCityManager : MonoBehaviour
 
         phaseTransitionRunning = false;
 
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            userStudyDataManager.BeginAnalogyPhase(currentPhase);
+            userStudy.BeginAnalogyPhase(currentPhase);
         }
 
         ResetCurrentAnalogyChoices();
@@ -1293,9 +1295,9 @@ public class SuperCityManager : MonoBehaviour
 
         bool placementIsShowing = placementLayer != null && placementLayer.activeSelf;
 
-        if (!placementIsShowing && userStudyDataManager != null)
+        if (!placementIsShowing && userStudy != null)
         {
-            userStudyDataManager.RegisterAnalogyRepeat(currentPhase);
+            userStudy.RegisterAnalogyRepeat(currentPhase);
         }
 
         StopAllCoroutines();
@@ -1424,9 +1426,9 @@ public class SuperCityManager : MonoBehaviour
 
     public void ReturnToHome()
     {
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            bool saved = userStudyDataManager.SaveSessionForHome();
+            bool saved = userStudy.SaveSessionForHome();
             if (!saved)
             {
                 Debug.LogError("User study session could not be saved.");
@@ -1867,9 +1869,9 @@ public class SuperCityManager : MonoBehaviour
             finalScoreText.gameObject.SetActive(true);
         }
 
-        if (userStudyDataManager != null)
+        if (userStudy != null)
         {
-            bool saved = userStudyDataManager.CompleteSession();
+            bool saved = userStudy.CompleteSession();
             if (!saved)
             {
                 Debug.LogError("Completed user study session could not be saved.");
