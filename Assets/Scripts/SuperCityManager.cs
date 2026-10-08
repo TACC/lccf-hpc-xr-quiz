@@ -39,14 +39,14 @@ public class SuperCityManager : MonoBehaviour
     {
         if (userStudyDataManager == null)
         {
-            Debug.LogError("UserStudyDataManager is not assigned.");
-            return;
-        }
-
-        if (!userStudyDataManager.BeginSession(analogyController.NumberOfPhases))
+            if (!userStudyDataManager.BeginSession(analogyController.NumberOfPhases))
+            {
+                Debug.LogError("Could not begin the user study session.");
+            }
+        } 
+        else 
         {
-            Debug.LogError("Could not begin user study session.");
-            return;
+             Debug.LogError("UserStudyDataManager is not assigned.");
         }
 
         replayController.ResetEntireQuiz();
