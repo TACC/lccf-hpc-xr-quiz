@@ -37,7 +37,7 @@ public class SuperCityManager : MonoBehaviour
 
     public void BeginQuiz()
     {
-        if (userStudyDataManager == null)
+        if (userStudyDataManager != null)
         {
             if (!userStudyDataManager.BeginSession(analogyController.NumberOfPhases))
             {
