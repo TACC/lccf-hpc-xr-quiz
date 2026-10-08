@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class IntroScreenController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class IntroScreenController : MonoBehaviour
     public AudioClip firstBeginAudio;
     public AudioClip secondBeginAudio;
     public AudioClip finalSceneAudio;
+
+    [SerializeField] private TMP_InputField participantIdInput;
+    [SerializeField] private UserStudyDataManager userStudyDataManager;
 
     void Start()
     {
@@ -40,6 +44,32 @@ public class IntroScreenController : MonoBehaviour
 
     public void StartQuiz()
     {
+        if (participantIdInput == null)
+        {
+            Debug.LogError("Participant ID input field is not assigned.");
+            return;
+        }
+
+        string participantId = participantIdInput.text.Trim();
+
+        if (string.IsNullOrEmpty(participantId))
+        {
+            Debug.LogError("Plase enter a participant ID.");
+            return; 
+        }
+
+        if (userStudyDataManager == null)
+        {
+            Debug.LogError("UserStudyDataManager is not assigned.");
+            return;
+        }
+
+        if (!userStudyDataManager.SetParticipantId(participantId))
+        {
+            Debug.LogError("Invalid participant ID. Use only letters, numbers, hyphens, or underscores.");
+            return;
+        }
+
         beginScene.SetActive(false);
         beginTwo.SetActive(false);
         finalScene.SetActive(false);
@@ -50,6 +80,10 @@ public class IntroScreenController : MonoBehaviour
         if (superCityManager != null)
         {
             superCityManager.BeginQuiz();
+        }
+        else 
+        {
+            Debug.LogError("SuperCityManager is not assigned.");
         }
     }
 

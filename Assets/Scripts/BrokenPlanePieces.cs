@@ -274,6 +274,17 @@ public class BrokenCityPieces : MonoBehaviour
             startWorldRotations[i] = pieces[i].rotation;
         }
 
+        if (pieces.Length > 0 && pieces[0] != null)
+        {
+            Debug.Log(
+                "Piece 0 repair distance = " +
+                Vector3.Distance(
+                    startWorldPositions[0],
+                    originalWorldPositions[0]
+                )
+            );
+        }
+
         // Tracks how much time has passed in the repair animation
         float elapsed = 0f;
 

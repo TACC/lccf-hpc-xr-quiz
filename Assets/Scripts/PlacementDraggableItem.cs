@@ -30,13 +30,6 @@ public class PlacementDraggableItem :
     private float lockedWorldZ;
     private Quaternion lockedWorldRotation;
 
-
-    [Header("Auto Snap")]
-
-    // How long it takes for the object to float to the correct spot
-    public float autoSnapDuration = 1.5f;
-
-
     [Header("Reset")]
 
     // How long it takes for the object to move back to starting position
@@ -272,24 +265,7 @@ public class PlacementDraggableItem :
             correctTarget.ShowGlow();
         }
 
-        // Move item to original spot to try again
-        if (wrongAttempts == 1)
-        {
-            StartCoroutine(MoveBackToStart());
-        }
-        else
-        {
-            // Automatically float the item to the correct target
-            if (correctTarget != null)
-            {
-                StartCoroutine(FloatToCorrectSpot());
-            }
-            else
-            {
-                // If no correct target, just move back to start
-                StartCoroutine(MoveBackToStart());
-            }
-        }
+        StartCoroutine(MoveBackToStart());
     }
 
 
@@ -340,52 +316,6 @@ public class PlacementDraggableItem :
 
         isMoving = false;
     }
-
-
-    private IEnumerator FloatToCorrectSpot()
-    {
-        // Moves the item to the correct target
-
-        isMoving = true;
-
-        // Lock the object so it cannot be dragged again
-        isLocked = true;
-
-        Vector3 beginPosition = transform.position;
-        Quaternion beginRotation = transform.rotation;
-
-        // Get the final position and rotation from the correct target's snap point
-        Vector3 endPosition = correctTarget.snapPoint.position;
-        endPosition.z = lockedWorldZ;
-        Quaternion endRotation = lockedWorldRotation;
-
-        float elapsed = 0f;
-
-        // Animate until elapsed reaches autoSnapDuration
-        while (elapsed < autoSnapDuration)
-        {
-            elapsed += Time.deltaTime;
-
-            float t = elapsed / autoSnapDuration;
-
-            t = Mathf.SmoothStep(0f, 1f, t);
-
-            transform.position = Vector3.Lerp(beginPosition, endPosition, t);
-
-            transform.rotation = Quaternion.Slerp(beginRotation, endRotation, t);
-
-            yield return null;
-        }
-
-        transform.position = endPosition;
-        transform.rotation = endRotation;
-
-        // Hides the glow and SuperCityManager moves to the next part
-        correctTarget.TriggerSuccess();
-
-        isMoving = false;
-    }
-
 
     private void SnapToTarget(PlacementDropTarget target)
     {
