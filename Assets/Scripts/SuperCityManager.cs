@@ -2,14 +2,11 @@ using System.Collections;
 using UnityEngine;
 
 // SuperCityManager controls changing between scenes
-
-// Plays intro, city analogy phases, audio, city animations, sliding the 
-// analogies away, and placement layers
 public class SuperCityManager : MonoBehaviour
 {
     public int currentPhase = 0;
 
-    [SerializeField] private UserStudyDataManager userStudyDataManager;
+    [SerializeField] private UserStudyService userStudyService;
 
     private int analogyCorrectFirstTryScore = 0;
     private bool currentAnalogyHadWrongGuess = false;
@@ -37,16 +34,16 @@ public class SuperCityManager : MonoBehaviour
 
     public void BeginQuiz()
     {
-        if (userStudyDataManager != null)
+        if (userStudyService != null)
         {
-            if (!userStudyDataManager.BeginSession(analogyController.NumberOfPhases))
+            if (!userStudyService.BeginSession(analogyController.NumberOfPhases))
             {
                 Debug.LogError("Could not begin the user study session.");
             }
         } 
         else 
         {
-             Debug.LogError("UserStudyDataManager is not assigned.");
+             Debug.LogError("UserStudyService is not assigned.");
         }
 
         replayController.ResetEntireQuiz();
@@ -92,9 +89,9 @@ public class SuperCityManager : MonoBehaviour
             return;
         }
 
-        if (userStudyDataManager != null)
+        if (userStudyService != null)
         {
-            userStudyDataManager.CompleteAnalogyPhase(currentPhase);
+            userStudyService.CompleteAnalogyPhase(currentPhase);
         }
 
         if (!analogyScoreCountedThisPhase)
@@ -117,9 +114,14 @@ public class SuperCityManager : MonoBehaviour
 
     public void OnAnalogyWrongGuess()
     {
-        if (userStudyDataManager != null)
+        if (PhaseTransitionRunning)
         {
-            userStudyDataManager.RegisterAnalogyMistake(currentPhase);
+            return;
+        }
+
+        if (userStudyService != null)
+        {
+            userStudyService.RegisterAnalogyMistake(currentPhase);
         }
 
         currentAnalogyHadWrongGuess = true;
@@ -134,9 +136,9 @@ public class SuperCityManager : MonoBehaviour
             return;
         }
 
-        if (userStudyDataManager != null)
+        if (userStudyService != null)
         {
-            userStudyDataManager.CompletePlacementPhase(currentPhase);
+            userStudyService.CompletePlacementPhase(currentPhase);
         }
 
         placementController.OnHardwarePlaced();
@@ -144,9 +146,9 @@ public class SuperCityManager : MonoBehaviour
 
     public void ReturnToHome()
     {
-        if (userStudyDataManager != null)
+        if (userStudyService != null)
         {
-            bool saved = userStudyDataManager.SaveSessionForHome();
+            bool saved = userStudyService.SaveSessionForHome();
             if (!saved)
             {
                 Debug.LogError("User study session could not be saved.");
@@ -166,9 +168,9 @@ public class SuperCityManager : MonoBehaviour
 
     public bool PhaseTransitionRunning { get; set; } = false;
 
-    public UserStudyDataManager StudyData
+    public UserStudyService StudyData
     {
-        get { return userStudyDataManager; }
+        get { return userStudyService; }
     }
 
     public void ResetAnalogyAttemptState()

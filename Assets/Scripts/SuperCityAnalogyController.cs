@@ -203,14 +203,14 @@ public class SuperCityAnalogyController : MonoBehaviour
         analogyVisualsFinished = false;
         analogySolved = false;
 
+        ResetCurrentAnalogyChoices();
+
         manager.PhaseTransitionRunning = false;
 
         if (manager.StudyData != null)
         {
             manager.StudyData.BeginAnalogyPhase(manager.currentPhase);
         }
-
-        ResetCurrentAnalogyChoices();
 
         StartCoroutine(audioController.PlayAnalogyAudioForCurrentPhase());
 

@@ -92,12 +92,16 @@ public class SuperCityFinalSceneController : MonoBehaviour
             finalScoreText.gameObject.SetActive(true);
         }
 
-        if (manager.StudyData != null)
+        if (manager.StudyData != null && manager.StudyData.IsSessionActive)
         {
             bool saved = manager.StudyData.CompleteSession();
             if (!saved)
             {
                 Debug.LogError("Completed user study session could not be saved.");
+            }
+            else
+            {
+                Debug.Log("User study session completed successfully.");
             }
         }
 

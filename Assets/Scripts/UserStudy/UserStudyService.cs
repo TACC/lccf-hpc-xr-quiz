@@ -57,6 +57,18 @@ public class UserStudyService : MonoBehaviour
     {
         Setup();
 
+        if (recorder.IsSessionActive)
+        {
+            Debug.LogWarning("[UserStudy] Cannot change study mode " + 
+                "while a session is active.");
+            return;
+        }
+
+        if (IsStudyRun == isStudyRun)
+        {
+            return;
+        }
+
         IsStudyRun = isStudyRun;
 
         if (isStudyRun)
@@ -146,6 +158,11 @@ public class UserStudyService : MonoBehaviour
         {
             EndSession("Quit", false);
         }
+    }
+
+    public bool IsSessionActive 
+    {
+        get { return recorder.IsSessionActive; }
     }
 
     private bool EndSession(string reason, bool completed)
