@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12731707, g: 0.13414727, b: 0.12107857, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731704, g: 0.13414727, b: 0.121078536, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -14312,6 +14312,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 1622619362}
     m_Modifications:
     - target: {fileID: 1501338644636541941, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1501338644636541941, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1501338644636541941, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1501338644636541941, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -14431,10 +14443,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: CreditsPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 4999181157986981806, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5507514001110076564, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 2319756697122938857, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 3188613468149392351, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 3216768094574336933, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
+    - targetCorrespondingSourceObject: {fileID: 4591969605382860534, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 7191f53360f318e44a514f3969d99f2b, type: 3}
 --- !u!4 &256503826 stripped
 Transform:
@@ -89972,7 +90003,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1000, y: 7000, z: 0}
-  m_LocalScale: {x: 15000, y: 15000, z: 15000}
+  m_LocalScale: {x: 13000, y: 13000, z: 13000}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2040709807}
